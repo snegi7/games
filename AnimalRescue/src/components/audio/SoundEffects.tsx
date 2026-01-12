@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { SOUNDS, getAnimalSoundName } from '@/hooks/useSound';
+import { AudioManager } from '@/utils/AudioManager';
 import { playSuccessSound, playFailureSound, playAnimalSound } from '@/utils/soundGenerator';
 
 export function SoundEffects() {
@@ -14,23 +15,23 @@ export function SoundEffects() {
       // A new animal was saved!
       const newlySaved = savedCreatures[savedCreatures.length - 1];
       
-      // Try to play audio file, fallback to synthesized sound
-      const chime = new Audio(SOUNDS.successChime);
-      chime.volume = 0.6;
-      chime.play().catch(() => {
-        // Fallback to synthesized success sound
+      // Try to play audio file via AudioManager
+      const sfx = AudioManager.playSfx(SOUNDS.successChime, 0.6);
+      
+      if (!sfx) {
+        // Fallback to synthesized success sound if audio not unlocked
         playSuccessSound();
-      });
+      }
 
       // Play animal-specific sound after a short delay
       setTimeout(() => {
         const animalSoundKey = getAnimalSoundName(newlySaved.id);
-        const animalSound = new Audio(SOUNDS[animalSoundKey]);
-        animalSound.volume = 0.7;
-        animalSound.play().catch(() => {
+        const animalSfx = AudioManager.playSfx(SOUNDS[animalSoundKey], 0.7);
+        
+        if (!animalSfx) {
           // Fallback to synthesized animal sound
           playAnimalSound(animalSoundKey);
-        });
+        }
       }, 300);
     }
     prevSavedCountRef.current = savedCreatures.length;
@@ -44,12 +45,12 @@ export function SoundEffects() {
       lostCreatures.length > 0
     ) {
       // Game ended with failure
-      const failureSound = new Audio(SOUNDS.failure);
-      failureSound.volume = 0.5;
-      failureSound.play().catch(() => {
+      const sfx = AudioManager.playSfx(SOUNDS.failure, 0.5);
+      
+      if (!sfx) {
         // Fallback to synthesized failure sound
         playFailureSound();
-      });
+      }
     }
     
     prevScreenRef.current = currentScreen;

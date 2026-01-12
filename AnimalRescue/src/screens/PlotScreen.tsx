@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { Button, Card, AnimalCard } from '@/components/ui';
 import { useGameStore } from '@/store/gameStore';
-import { unlockAudio } from '@/utils/audioUnlock';
 import styles from './PlotScreen.module.css';
 
 export function PlotScreen() {
@@ -9,9 +8,8 @@ export function PlotScreen() {
 
   if (!currentPlot) return null;
 
-  const handleContinue = async () => {
-    // Unlock audio on this user interaction (important for mobile)
-    await unlockAudio();
+  const handleContinue = () => {
+    // AudioManager auto-unlocks on user interaction
     goToScreen('gameplay');
   };
 
