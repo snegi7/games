@@ -297,7 +297,7 @@ export const mathQuestionsAge8: Question[] = [
   { id: 'm8-254', category: 'math', ageLevel: 8, question: 'If you have $2.00, how many dimes?', options: ['10', '20', '30', '40'], correctAnswerIndex: 1, difficulty: 'hard' },
   { id: 'm8-255', category: 'math', ageLevel: 8, question: 'What is 3 times 3 plus 3?', options: ['9', '12', '15', '18'], correctAnswerIndex: 1, difficulty: 'medium' },
   { id: 'm8-256', category: 'math', ageLevel: 8, question: 'What is 10 times 10 minus 10?', options: ['80', '90', '100', '110'], correctAnswerIndex: 1, difficulty: 'medium' },
-  { id: 'm8-257', category: 'math', ageLevel: '8', question: 'A car travels 10 km in 10 minutes. How far in 1 hour?', options: ['40 km', '50 km', '60 km', '100 km'], correctAnswerIndex: 2, difficulty: 'hard' },
+  { id: 'm8-257', category: 'math', ageLevel: 8, question: 'A car travels 10 km in 10 minutes. How far in 1 hour?', options: ['40 km', '50 km', '60 km', '100 km'], correctAnswerIndex: 2, difficulty: 'hard' },
   { id: 'm8-258', category: 'math', ageLevel: 8, question: 'A cake is cut in 8 pieces. You eat 2. Fraction left?', options: ['2/8', '4/8', '6/8', '1/8'], correctAnswerIndex: 2, difficulty: 'hard' },
   { id: 'm8-259', category: 'math', ageLevel: 8, question: 'Double 100 is...?', options: ['100', '200', '300', '400'], correctAnswerIndex: 1, difficulty: 'easy' },
   { id: 'm8-260', category: 'math', ageLevel: 8, question: 'Double 500 is...?', options: ['500', '1000', '1500', '2000'], correctAnswerIndex: 1, difficulty: 'easy' },
