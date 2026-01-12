@@ -38,7 +38,7 @@ export interface Plot {
   id: string;
   title: string;
   description: string;
-  backgroundType: 'forest-fire' | 'oil-spill' | 'flood' | 'storm' | 'earthquake';
+  backgroundType: 'forest-fire' | 'oil-spill' | 'flood' | 'storm' | 'earthquake' | 'zoo-breakout' | 'drought' | 'volcano' | 'pollution' | 'arctic';
   creatures: Creature[];
   questionsPerCreature: number;
   timePerQuestion: number; // in seconds

@@ -31,6 +31,81 @@
   );
 }
 
+.flood {
+  background: linear-gradient(
+    to bottom,
+    #003366 0%,
+    #006699 30%,
+    #3399cc 60%,
+    #66ccff 100%
+  );
+}
+
+.zooBreakout {
+  background: linear-gradient(
+    to bottom,
+    #1a1a1a 0%,
+    #333333 50%,
+    #4d4d4d 100%
+  );
+}
+
+.drought {
+  background: linear-gradient(
+    to bottom,
+    #4a3728 0%,
+    #8b4513 30%,
+    #cd853f 60%,
+    #deb887 100%
+  );
+}
+
+.earthquake {
+  background: linear-gradient(
+    to bottom,
+    #2f4f4f 0%,
+    #556b2f 50%,
+    #8b4513 100%
+  );
+}
+
+.storm {
+  background: linear-gradient(
+    to bottom,
+    #2c3e50 0%,
+    #34495e 50%,
+    #7f8c8d 100%
+  );
+}
+
+.arctic {
+  background: linear-gradient(
+    to bottom,
+    #e0f7fa 0%,
+    #b2ebf2 50%,
+    #ffffff 100%
+  );
+}
+
+.pollution {
+  background: linear-gradient(
+    to bottom,
+    #1b262c 0%,
+    #0f4c75 50%,
+    #3282b8 100%
+  );
+}
+
+.volcano {
+  background: linear-gradient(
+    to bottom,
+    #2c0000 0%,
+    #800000 40%,
+    #ff4500 80%,
+    #ffd700 100%
+  );
+}
+
 /* Effects layer */
 .effects {
   position: absolute;

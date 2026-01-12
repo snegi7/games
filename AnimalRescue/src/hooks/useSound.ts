@@ -133,16 +133,36 @@ export function useSoundPlayer() {
 // Map creature IDs to their sound names
 export function getAnimalSoundName(creatureId: string): SoundName {
   const soundMap: Record<string, SoundName> = {
-    'leo': 'lion',
-    'ella': 'elephant',
-    'zara': 'zebra',
-    'milo': 'monkey',
-    'gigi': 'giraffe',
-    'nemo': 'clownfish',
-    'shelly': 'turtle',
-    'dolly': 'dolphin',
-    'oscar': 'octopus',
-    'wally': 'whale',
+    // Forest Fire
+    'ff-1': 'lion',
+    'ff-2': 'elephant',
+    'ff-3': 'zebra',
+    'ff-4': 'monkey',
+    'ff-5': 'giraffe',
+    // Oil Spill
+    'os-1': 'clownfish',
+    'os-2': 'turtle',
+    'os-3': 'dolphin',
+    'os-4': 'octopus',
+    'os-5': 'whale',
+    // Farm Flood (Mapping to similar sounds or default)
+    'ffl-1': 'elephant', // Cow (similar trumpet)
+    'ffl-2': 'monkey',   // Pig (playful)
+    'ffl-3': 'zebra',    // Sheep (herbivore)
+    'ffl-4': 'zebra',    // Horse
+    'ffl-5': 'successChime', // Chicken
+    // Zoo Escape
+    'ze-1': 'successChime', // Panda
+    'ze-2': 'lion',        // Tiger
+    'ze-3': 'monkey',      // Gorilla
+    'ze-4': 'zebra',       // Kangaroo
+    'ze-5': 'successChime', // Peacock
+    // Arctic Melt
+    'am-1': 'successChime', // Penguin
+    'am-2': 'successChime', // Polar Bear
+    'am-3': 'dolphin',      // Seal
+    'am-4': 'successChime', // Arctic Fox
+    'am-5': 'successChime', // Snowy Owl
   };
   
   return soundMap[creatureId] || 'successChime';
@@ -153,6 +173,16 @@ export function getPlotMusic(plotId: string): SoundName {
   const musicMap: Record<string, SoundName> = {
     'forest-fire': 'forestFireMusic',
     'oil-spill': 'oilSpillMusic',
+    'farm-flood': 'forestFireMusic',
+    'zoo-escape': 'forestFireMusic',
+    'arctic-melt': 'oilSpillMusic',
+    'mountain-quake': 'forestFireMusic',
+    'desert-storm': 'forestFireMusic',
+    'jungle-flood': 'forestFireMusic',
+    'savanna-drought': 'forestFireMusic',
+    'city-storm': 'forestFireMusic',
+    'river-pollution': 'oilSpillMusic',
+    'volcano-eruption': 'forestFireMusic',
   };
   
   return musicMap[plotId] || 'forestFireMusic';

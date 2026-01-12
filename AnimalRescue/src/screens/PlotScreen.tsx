@@ -21,6 +21,22 @@ export function PlotScreen() {
         return styles.forestFire;
       case 'oil-spill':
         return styles.oilSpill;
+      case 'flood':
+        return styles.flood;
+      case 'zoo-breakout':
+        return styles.zooBreakout;
+      case 'drought':
+        return styles.drought;
+      case 'earthquake':
+        return styles.earthquake;
+      case 'storm':
+        return styles.storm;
+      case 'arctic':
+        return styles.arctic;
+      case 'pollution':
+        return styles.pollution;
+      case 'volcano':
+        return styles.volcano;
       default:
         return styles.forestFire;
     }
@@ -30,7 +46,7 @@ export function PlotScreen() {
     <div className={`${styles.container} ${getBackgroundClass()}`}>
       {/* Animated background effects */}
       <div className={styles.effects}>
-        {currentPlot.backgroundType === 'forest-fire' && (
+        {(currentPlot.backgroundType === 'forest-fire' || currentPlot.backgroundType === 'volcano') && (
           <>
             <div className={styles.flame} style={{ left: '10%', animationDelay: '0s' }} />
             <div className={styles.flame} style={{ left: '30%', animationDelay: '0.3s' }} />
@@ -40,13 +56,17 @@ export function PlotScreen() {
             <div className={styles.smoke} />
           </>
         )}
-        {currentPlot.backgroundType === 'oil-spill' && (
+        {(currentPlot.backgroundType === 'oil-spill' || currentPlot.backgroundType === 'flood' || currentPlot.backgroundType === 'pollution') && (
           <>
             <div className={styles.wave} style={{ bottom: '20%' }} />
             <div className={styles.wave} style={{ bottom: '30%', animationDelay: '-2s' }} />
-            <div className={styles.oilBlob} style={{ left: '20%', top: '40%' }} />
-            <div className={styles.oilBlob} style={{ left: '60%', top: '50%', animationDelay: '-1s' }} />
-            <div className={styles.oilBlob} style={{ left: '80%', top: '35%', animationDelay: '-2s' }} />
+            {currentPlot.backgroundType === 'oil-spill' && (
+              <>
+                <div className={styles.oilBlob} style={{ left: '20%', top: '40%' }} />
+                <div className={styles.oilBlob} style={{ left: '60%', top: '50%', animationDelay: '-1s' }} />
+                <div className={styles.oilBlob} style={{ left: '80%', top: '35%', animationDelay: '-2s' }} />
+              </>
+            )}
           </>
         )}
       </div>
