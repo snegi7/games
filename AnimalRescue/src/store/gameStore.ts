@@ -101,7 +101,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       currentPlot,
       currentCreatureIndex,
       currentQuestionIndex,
-      questionsForCurrentAnimal,
       savedCreatures,
       lostCreatures,
       user,

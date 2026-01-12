@@ -448,7 +448,7 @@ export function createOceanMusic(): () => void {
   // Eerie underwater pad (minor chord feel)
   const padFreqs = [82.41, 98, 123.47]; // E2, G2 (minor), B2
   
-  padFreqs.forEach((freq, i) => {
+  padFreqs.forEach((freq) => {
     const padOsc = ctx.createOscillator();
     const padGain = ctx.createGain();
     const padFilter = ctx.createBiquadFilter();
