@@ -5,6 +5,7 @@ import {
   PlotScreen,
   GamePlayScreen,
   ResultScreen,
+  AnimalTriviaScreen,
 } from './screens';
 import { BackgroundMusic } from './components/audio/BackgroundMusic';
 import { SoundEffects } from './components/audio/SoundEffects';
@@ -22,6 +23,8 @@ function App() {
         return <GamePlayScreen />;
       case 'result':
         return <ResultScreen />;
+      case 'animal-trivia':
+        return <AnimalTriviaScreen />;
       default:
         return <AgeSelectionScreen />;
     }

@@ -10,6 +10,8 @@ export function ResultScreen() {
     lostCreatures,
     playAgain,
     resetGame,
+    playNextPlot,
+    goToTrivia,
   } = useGameStore();
 
   if (!currentPlot) return null;
@@ -162,6 +164,23 @@ export function ResultScreen() {
             </motion.div>
           )}
 
+          {/* Learn About Animals Button */}
+          <motion.div
+            className={styles.triviaAction}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.0 }}
+          >
+            <Button
+              variant="secondary"
+              size="lg"
+              onClick={goToTrivia}
+              className={styles.triviaButton}
+            >
+              🧠 Learn About the Animals
+            </Button>
+          </motion.div>
+
           <motion.div
             className={styles.actions}
             initial={{ opacity: 0 }}
@@ -174,6 +193,13 @@ export function ResultScreen() {
               onClick={playAgain}
             >
               🔄 Play Again
+            </Button>
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={playNextPlot}
+            >
+              ➡️ Next Adventure
             </Button>
             <Button
               variant="ghost"

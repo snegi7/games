@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { User, Plot, GameScreen, Creature, Question } from '@/types';
-import { getRandomPlot } from '@/data/plots';
+import { getRandomPlot, getNextPlot } from '@/data/plots';
 import { getRandomQuestions } from '@/data/questions';
 import { userApi, sessionApi } from '@/services/api';
 
@@ -36,6 +36,9 @@ interface GameState {
   
   resetGame: () => void;
   playAgain: () => void;
+  playNextPlot: () => void;
+  goToTrivia: () => void;
+  goBackToResult: () => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -234,16 +237,20 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
   },
 
-  // Play again with same user
+  // Play again with same user and same plot
   playAgain: () => {
-    const { user } = get();
-    if (!user) return;
+    const { user, currentPlot } = get();
+    if (!user || !currentPlot) return;
 
-    const plot = getRandomPlot();
-    const questions = getRandomQuestions('math', user.age, plot.questionsPerCreature);
+    // Reset creatures to pending state
+    const resetPlot = {
+      ...currentPlot,
+      creatures: currentPlot.creatures.map(c => ({ ...c, savedState: 'pending' as const })),
+    };
+    const questions = getRandomQuestions('math', user.age, resetPlot.questionsPerCreature);
 
     set({
-      currentPlot: plot,
+      currentPlot: resetPlot,
       currentCreatureIndex: 0,
       currentQuestionIndex: 0,
       questionsForCurrentAnimal: questions,
@@ -252,5 +259,35 @@ export const useGameStore = create<GameState>((set, get) => ({
       currentScreen: 'plot',
       isTimerRunning: false,
     });
+  },
+
+  // Play next plot with same age
+  playNextPlot: () => {
+    const { user, currentPlot } = get();
+    if (!user) return;
+
+    const nextPlot = getNextPlot(currentPlot?.id);
+    const questions = getRandomQuestions('math', user.age, nextPlot.questionsPerCreature);
+
+    set({
+      currentPlot: nextPlot,
+      currentCreatureIndex: 0,
+      currentQuestionIndex: 0,
+      questionsForCurrentAnimal: questions,
+      savedCreatures: [],
+      lostCreatures: [],
+      currentScreen: 'plot',
+      isTimerRunning: false,
+    });
+  },
+
+  // Go to animal trivia screen
+  goToTrivia: () => {
+    set({ currentScreen: 'animal-trivia' });
+  },
+
+  // Go back to result screen from trivia
+  goBackToResult: () => {
+    set({ currentScreen: 'result' });
   },
 }));

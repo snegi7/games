@@ -119,6 +119,17 @@
   gap: var(--space-3);
 }
 
+.triviaAction {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+}
+
+.triviaButton {
+  width: 100%;
+  max-width: 300px;
+}
+
 .actions {
   display: flex;
   flex-direction: column;
@@ -128,6 +139,7 @@
 @media (min-width: 640px) {
   .actions {
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: center;
   }
 }

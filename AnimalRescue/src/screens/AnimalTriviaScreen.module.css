@@ -1,0 +1,229 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #3d7ab0 100%);
+  overflow-y: auto;
+}
+
+.content {
+  max-width: 700px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* Header */
+.header {
+  text-align: center;
+}
+
+.title {
+  font-size: var(--text-4xl);
+  color: var(--color-white);
+  margin-bottom: var(--space-2);
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.subtitle {
+  font-size: var(--text-lg);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Animal Selector */
+.animalSelector {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4);
+  backdrop-filter: blur(10px);
+}
+
+.animalGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.animalButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  border: 3px solid transparent;
+  background: rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  min-width: 80px;
+}
+
+.animalButton:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.animalButton.selected {
+  border-color: var(--color-white);
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.animalButton.saved {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.animalButton.saved.selected {
+  border-color: #4ade80;
+  background: rgba(34, 197, 94, 0.35);
+}
+
+.animalButton.lost {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.animalButton.lost.selected {
+  border-color: #f87171;
+  background: rgba(239, 68, 68, 0.35);
+}
+
+.animalEmoji {
+  font-size: 2rem;
+}
+
+.animalName {
+  font-size: var(--text-xs);
+  color: var(--color-white);
+  font-weight: 600;
+}
+
+.statusBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  font-size: 0.9rem;
+}
+
+/* Trivia Section */
+.triviaSection {
+  width: 100%;
+}
+
+.triviaCard {
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(20px);
+}
+
+.triviaHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.creatureInfo {
+  flex: 1;
+}
+
+.creatureName {
+  font-size: var(--text-2xl);
+  color: var(--color-white);
+  margin-bottom: var(--space-1);
+}
+
+.creatureDescription {
+  font-size: var(--text-sm);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Trivia List */
+.triviaList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.triviaListTitle {
+  font-size: var(--text-xl);
+  color: #fcd34d;
+  margin-bottom: var(--space-2);
+}
+
+.triviaItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  background: rgba(255, 255, 255, 0.08);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  border-left: 4px solid #fbbf24;
+}
+
+.triviaNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #1e3a5f;
+  font-weight: 700;
+  font-size: var(--text-sm);
+}
+
+.triviaFact {
+  flex: 1;
+  font-size: var(--text-base);
+  color: var(--color-white);
+  line-height: 1.6;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  justify-content: center;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .container {
+    padding: var(--space-3);
+  }
+
+  .title {
+    font-size: var(--text-3xl);
+  }
+
+  .subtitle {
+    font-size: var(--text-base);
+  }
+
+  .animalButton {
+    min-width: 70px;
+    padding: var(--space-2);
+  }
+
+  .animalEmoji {
+    font-size: 1.5rem;
+  }
+
+  .triviaHeader {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .triviaItem {
+    padding: var(--space-3);
+  }
+
+  .triviaFact {
+    font-size: var(--text-sm);
+  }
+}

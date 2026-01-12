@@ -31,6 +31,7 @@ export interface Creature {
   emoji: string;
   description: string;
   savedState: 'pending' | 'saved' | 'lost';
+  trivia: [string, string, string]; // 3 cool facts about the animal
 }
 
 // Plot types - extensible for adding more plots
@@ -45,7 +46,7 @@ export interface Plot {
 }
 
 // Game state types
-export type GameScreen = 'age-selection' | 'plot' | 'gameplay' | 'result';
+export type GameScreen = 'age-selection' | 'plot' | 'gameplay' | 'result' | 'animal-trivia';
 
 export interface GameProgress {
   currentPlot: Plot | null;

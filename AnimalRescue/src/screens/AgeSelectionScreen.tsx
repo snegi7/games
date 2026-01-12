@@ -110,7 +110,7 @@ export function AgeSelectionScreen() {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
-                <span className={styles.dialIcon}>▲</span>
+                <span className={styles.dialIcon}>▼</span>
               </motion.button>
 
               <div className={styles.ageDisplay}>
@@ -142,7 +142,7 @@ export function AgeSelectionScreen() {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
-                <span className={styles.dialIcon}>▼</span>
+                <span className={styles.dialIcon}>▲</span>
               </motion.button>
             </div>
 

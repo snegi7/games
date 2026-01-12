@@ -1,33 +1,36 @@
 import { useRef, useCallback, useEffect } from 'react';
 
+// Base URL for assets
+const BASE_URL = import.meta.env.BASE_URL;
+
 // Sound URLs - using free sound effects
 // In production, you'd host these locally or use a CDN
 export const SOUNDS = {
   // Background music for plots
-  forestFireMusic: '/sounds/forest-fire-suspense.mp3',
-  oilSpillMusic: '/sounds/ocean-crisis-suspense.mp3',
+  forestFireMusic: `${BASE_URL}sounds/forest-fire-suspense.mp3`,
+  oilSpillMusic: `${BASE_URL}sounds/ocean-crisis-suspense.mp3`,
   
   // Clock tick
-  clockTick: '/sounds/clock-tick.mp3',
+  clockTick: `${BASE_URL}sounds/clock-tick.mp3`,
   
   // Success sounds
-  successChime: '/sounds/success-chime.mp3',
+  successChime: `${BASE_URL}sounds/success-chime.mp3`,
   
   // Animal sounds
-  lion: '/sounds/animals/lion-roar.mp3',
-  elephant: '/sounds/animals/elephant-trumpet.mp3',
-  zebra: '/sounds/animals/zebra-neigh.mp3',
-  monkey: '/sounds/animals/monkey-chatter.mp3',
-  giraffe: '/sounds/animals/giraffe-hum.mp3',
-  clownfish: '/sounds/animals/bubbles.mp3',
-  turtle: '/sounds/animals/splash.mp3',
-  dolphin: '/sounds/animals/dolphin-click.mp3',
-  octopus: '/sounds/animals/underwater-bubbles.mp3',
-  whale: '/sounds/animals/whale-song.mp3',
+  lion: `${BASE_URL}sounds/animals/lion-roar.mp3`,
+  elephant: `${BASE_URL}sounds/animals/elephant-trumpet.mp3`,
+  zebra: `${BASE_URL}sounds/animals/zebra-neigh.mp3`,
+  monkey: `${BASE_URL}sounds/animals/monkey-chatter.mp3`,
+  giraffe: `${BASE_URL}sounds/animals/giraffe-hum.mp3`,
+  clownfish: `${BASE_URL}sounds/animals/bubbles.mp3`,
+  turtle: `${BASE_URL}sounds/animals/splash.mp3`,
+  dolphin: `${BASE_URL}sounds/animals/dolphin-click.mp3`,
+  octopus: `${BASE_URL}sounds/animals/underwater-bubbles.mp3`,
+  whale: `${BASE_URL}sounds/animals/whale-song.mp3`,
   
   // Failure sound
-  failure: '/sounds/failure-sad.mp3',
-  wrongAnswer: '/sounds/wrong-buzzer.mp3',
+  failure: `${BASE_URL}sounds/failure-sad.mp3`,
+  wrongAnswer: `${BASE_URL}sounds/wrong-buzzer.mp3`,
 } as const;
 
 export type SoundName = keyof typeof SOUNDS;
