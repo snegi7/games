@@ -108,14 +108,71 @@
   font-size: 0.9rem;
 }
 
+/* Trivia Wrapper with Navigation */
+.triviaWrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  position: relative;
+}
+
+/* Navigation Arrows */
+.navArrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  backdrop-filter: blur(10px);
+}
+
+.navArrow:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.navArrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.navArrowLeft {
+  /* Position on left */
+}
+
+.navArrowRight {
+  /* Position on right */
+}
+
+.arrowIcon {
+  font-size: 2rem;
+  color: white;
+  line-height: 1;
+  font-weight: 300;
+}
+
 /* Trivia Section */
 .triviaSection {
+  flex: 1;
   width: 100%;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.triviaSection:active {
+  cursor: grabbing;
 }
 
 .triviaCard {
   background: rgba(255, 255, 255, 0.12) !important;
   backdrop-filter: blur(20px);
+  user-select: none;
 }
 
 .triviaHeader {
@@ -185,6 +242,42 @@
   line-height: 1.6;
 }
 
+/* Swipe Hint */
+.swipeHint {
+  text-align: center;
+  font-size: var(--text-sm);
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Page Indicator Dots */
+.pageIndicator {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.pageDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pageDot:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.pageDot.activeDot {
+  background: white;
+  transform: scale(1.2);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
 /* Actions */
 .actions {
   display: flex;
@@ -225,5 +318,32 @@
 
   .triviaFact {
     font-size: var(--text-sm);
+  }
+
+  /* Smaller arrows on mobile */
+  .navArrow {
+    width: 40px;
+    height: 40px;
+  }
+
+  .arrowIcon {
+    font-size: 1.5rem;
+  }
+
+  /* Show swipe hint more prominently on mobile */
+  .swipeHint {
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+/* Hide arrows on very small screens, rely on swipe */
+@media (max-width: 480px) {
+  .navArrow {
+    width: 36px;
+    height: 36px;
+  }
+
+  .arrowIcon {
+    font-size: 1.25rem;
   }
 }

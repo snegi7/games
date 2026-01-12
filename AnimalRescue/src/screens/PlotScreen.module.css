@@ -81,9 +81,11 @@
 .arctic {
   background: linear-gradient(
     to bottom,
-    #e0f7fa 0%,
-    #b2ebf2 50%,
-    #ffffff 100%
+    #0a1929 0%,
+    #1a3a5c 25%,
+    #2d6a8a 50%,
+    #4a9cb8 75%,
+    #6bc4d9 100%
   );
 }
 
