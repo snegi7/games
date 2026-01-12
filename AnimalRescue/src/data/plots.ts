@@ -89,7 +89,7 @@ export const plots: Plot[] = [
     backgroundType: 'forest-fire',
     creatures: forestFireCreatures,
     questionsPerCreature: 3,
-    timePerQuestion: 10,
+    timePerQuestion: 20,
   },
   {
     id: 'oil-spill',
@@ -98,7 +98,7 @@ export const plots: Plot[] = [
     backgroundType: 'oil-spill',
     creatures: oilSpillCreatures,
     questionsPerCreature: 3,
-    timePerQuestion: 10,
+    timePerQuestion: 20,
   },
 ];
 

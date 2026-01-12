@@ -1,38 +1,36 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { SOUNDS, getPlotMusic } from '@/hooks/useSound';
-import { playAudioElement, unlockAudio } from '@/utils/audioUnlock';
+import { playAudioElement, unlockAudio, isAudioUnlocked, setPendingAudio } from '@/utils/audioUnlock';
 
 export function BackgroundMusic() {
   const currentScreen = useGameStore((state) => state.currentScreen);
   const currentPlot = useGameStore((state) => state.currentPlot);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const hasUserInteracted = useRef(false);
 
   // Unlock audio on any user interaction
-  const handleUserInteraction = useCallback(() => {
-    if (!hasUserInteracted.current) {
-      hasUserInteracted.current = true;
-      unlockAudio();
+  const handleUserInteraction = useCallback(async () => {
+    await unlockAudio();
       
-      // If we should be playing music, start it now
-      if ((currentScreen === 'plot' || currentScreen === 'gameplay') && audioRef.current) {
-        playAudioElement(audioRef.current);
-      }
+    // If we should be playing music and have audio ready, start it now
+    if ((currentScreen === 'plot' || currentScreen === 'gameplay') && audioRef.current) {
+      playAudioElement(audioRef.current);
     }
   }, [currentScreen]);
 
   // Listen for user interaction to unlock audio
   useEffect(() => {
-    const events = ['touchstart', 'touchend', 'click', 'keydown'];
+    const events = ['touchstart', 'touchend', 'click', 'keydown', 'pointerdown'];
+    
+    const handler = () => handleUserInteraction();
     
     events.forEach(event => {
-      document.addEventListener(event, handleUserInteraction, { once: true, passive: true });
+      document.addEventListener(event, handler, { passive: true });
     });
 
     return () => {
       events.forEach(event => {
-        document.removeEventListener(event, handleUserInteraction);
+        document.removeEventListener(event, handler);
       });
     };
   }, [handleUserInteraction]);
@@ -49,16 +47,21 @@ export function BackgroundMusic() {
       const musicKey = getPlotMusic(currentPlot.id);
       const musicSrc = SOUNDS[musicKey];
       
-      // Try to load and play audio file
+      // Create audio element
       const audio = new Audio(musicSrc);
       audio.loop = true;
       audio.volume = 0.25;
+      audio.preload = 'auto';
       audioRef.current = audio;
       
-      // Try to play - will work if user has already interacted
-      playAudioElement(audio).catch(() => {
-        console.log('Background music waiting for user interaction...');
-      });
+      // If already unlocked, play immediately
+      if (isAudioUnlocked()) {
+        playAudioElement(audio);
+      } else {
+        // Otherwise, set as pending to play when unlocked
+        setPendingAudio(audio);
+        console.log('Background music queued, waiting for user interaction...');
+      }
       
     } else {
       // Stop music when not in gameplay
