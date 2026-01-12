@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Satyarth's Games</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+</head>
+<body>
+  <div class="noise"></div>
+  <div class="scanlines"></div>
+  
+  <header class="header">
+    <div class="logo">
+      <span class="logo-icon">🎮</span>
+      <span class="logo-text">SATYARTH'S GAMES</span>
+    </div>
+    <p class="tagline">Handcrafted browser games for curious minds</p>
+  </header>
+
+  <main class="container">
+    <section class="games-grid">
+      <article class="game-card" onclick="window.location.href='/AnimalRescue/'">
+        <div class="game-card-inner">
+          <div class="game-cover">
+            <img src="assets/animal-rescue-cover.svg" alt="Animal Rescue" />
+            <div class="game-badge">NEW</div>
+          </div>
+          <div class="game-info">
+            <h2 class="game-title">Animal Rescue</h2>
+            <p class="game-description">Save adorable creatures by solving math puzzles! Race against time in thrilling rescue missions.</p>
+            <div class="game-meta">
+              <span class="game-tag">🧮 Math</span>
+              <span class="game-tag">🦊 Animals</span>
+              <span class="game-tag">👶 Ages 6-14</span>
+            </div>
+            <button class="play-button">
+              <span class="play-icon">▶</span>
+              PLAY NOW
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Placeholder for future games -->
+      <article class="game-card coming-soon">
+        <div class="game-card-inner">
+          <div class="game-cover placeholder">
+            <div class="coming-soon-icon">🚀</div>
+          </div>
+          <div class="game-info">
+            <h2 class="game-title">Coming Soon</h2>
+            <p class="game-description">More exciting games are in development. Stay tuned!</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="game-card coming-soon">
+        <div class="game-card-inner">
+          <div class="game-cover placeholder">
+            <div class="coming-soon-icon">🎯</div>
+          </div>
+          <div class="game-info">
+            <h2 class="game-title">Coming Soon</h2>
+            <p class="game-description">Something fun is cooking...</p>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Built with ❤️ by Satyarth</p>
+  </footer>
+</body>
+</html>
