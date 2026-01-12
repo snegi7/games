@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Card } from '@/components/ui';
 import { useGameStore } from '@/store/gameStore';
 import { DEFAULT_GAME_CONFIG } from '@/types';
+import { unlockAudio } from '@/utils/audioUnlock';
 import styles from './AgeSelectionScreen.module.css';
 
 export function AgeSelectionScreen() {
@@ -25,6 +26,8 @@ export function AgeSelectionScreen() {
   };
 
   const handleStart = async () => {
+    // Unlock audio on user interaction (important for mobile)
+    await unlockAudio();
     await setUserAge(selectedAge);
     startGame();
   };
