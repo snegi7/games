@@ -6,10 +6,6 @@ const BASE_URL = import.meta.env.BASE_URL;
 // Sound URLs - using free sound effects
 // In production, you'd host these locally or use a CDN
 export const SOUNDS = {
-  // Background music for plots
-  forestFireMusic: `${BASE_URL}sounds/forest-fire-suspense.mp3`,
-  oilSpillMusic: `${BASE_URL}sounds/ocean-crisis-suspense.mp3`,
-  
   // Clock tick
   clockTick: `${BASE_URL}sounds/clock-tick.mp3`,
   
@@ -171,22 +167,3 @@ export function getAnimalSoundName(creatureId: string): SoundName {
   return soundMap[creatureId] || 'successChime';
 }
 
-// Get background music for a plot
-export function getPlotMusic(plotId: string): SoundName {
-  const musicMap: Record<string, SoundName> = {
-    'forest-fire': 'forestFireMusic',
-    'oil-spill': 'oilSpillMusic',
-    'farm-flood': 'forestFireMusic',
-    'zoo-escape': 'forestFireMusic',
-    'arctic-melt': 'oilSpillMusic',
-    'mountain-quake': 'forestFireMusic',
-    'desert-storm': 'forestFireMusic',
-    'jungle-flood': 'forestFireMusic',
-    'savanna-drought': 'forestFireMusic',
-    'city-storm': 'forestFireMusic',
-    'river-pollution': 'oilSpillMusic',
-    'volcano-eruption': 'forestFireMusic',
-  };
-  
-  return musicMap[plotId] || 'forestFireMusic';
-}

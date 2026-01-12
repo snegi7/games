@@ -1,7 +1,9 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useGameStore } from '@/store/gameStore';
-import { SOUNDS, getPlotMusic } from '@/hooks/useSound';
 import { playAudioElement, unlockAudio, isAudioUnlocked, setPendingAudio } from '@/utils/audioUnlock';
+
+// Base URL for assets
+const BASE_URL = import.meta.env.BASE_URL;
 
 export function BackgroundMusic() {
   const currentScreen = useGameStore((state) => state.currentScreen);
@@ -44,8 +46,7 @@ export function BackgroundMusic() {
         audioRef.current = null;
       }
 
-      const musicKey = getPlotMusic(currentPlot.id);
-      const musicSrc = SOUNDS[musicKey];
+      const musicSrc = `${BASE_URL}sounds/${currentPlot.musicFile}`;
       
       // Create audio element
       const audio = new Audio(musicSrc);

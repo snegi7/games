@@ -40,6 +40,7 @@ export interface Plot {
   title: string;
   description: string;
   backgroundType: 'forest-fire' | 'oil-spill' | 'flood' | 'storm' | 'earthquake' | 'zoo-breakout' | 'drought' | 'volcano' | 'pollution' | 'arctic';
+  musicFile: string; // Background music file name (in public/sounds/)
   creatures: Creature[];
   questionsPerCreature: number;
   timePerQuestion: number; // in seconds
