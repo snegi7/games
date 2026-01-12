@@ -217,8 +217,16 @@ body::before {
   font-family: 'Press Start 2P', monospace;
   font-size: 0.9rem;
   color: var(--text-primary);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.4rem;
   line-height: 1.4;
+}
+
+.game-credit {
+  font-size: 0.85rem;
+  color: var(--accent-primary);
+  font-style: italic;
+  margin-bottom: 0.75rem;
+  opacity: 0.9;
 }
 
 .game-description {
