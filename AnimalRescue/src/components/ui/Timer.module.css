@@ -1,0 +1,167 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.digitalClock {
+  position: relative;
+}
+
+.clockFrame {
+  position: relative;
+  background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+  border: 3px solid #2a2a4a;
+  border-radius: var(--radius-xl);
+  padding: var(--space-4) var(--space-6);
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -2px 10px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+/* LED decoration dots */
+.ledDots {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  display: flex;
+  gap: 4px;
+}
+
+.ledDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #333;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.safe .ledDot:first-child {
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+}
+
+.caution .ledDot:first-child,
+.caution .ledDot:last-child {
+  background: #f59e0b;
+  box-shadow: 0 0 8px #f59e0b;
+}
+
+.danger .ledDot:first-child,
+.danger .ledDot:last-child {
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+  animation: ledBlink 0.5s ease-in-out infinite;
+}
+
+@keyframes ledBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Digital display */
+.display {
+  min-width: 120px;
+  text-align: center;
+}
+
+.digits {
+  font-family: 'Courier New', 'SF Mono', monospace;
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-shadow: 0 0 10px currentColor;
+}
+
+/* Color states */
+.safe .digits {
+  color: #4ade80;
+  text-shadow: 0 0 20px rgba(74, 222, 128, 0.6);
+}
+
+.caution .digits {
+  color: #fbbf24;
+  text-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
+}
+
+.danger .digits {
+  color: #f87171;
+  text-shadow: 0 0 20px rgba(248, 113, 113, 0.8);
+  animation: textPulse 0.5s ease-in-out infinite;
+}
+
+@keyframes textPulse {
+  0%, 100% { 
+    transform: scale(1);
+    text-shadow: 0 0 20px rgba(248, 113, 113, 0.8);
+  }
+  50% { 
+    transform: scale(1.05);
+    text-shadow: 0 0 30px rgba(248, 113, 113, 1);
+  }
+}
+
+/* Pulse overlay for danger */
+.pulseOverlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.3) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Colon blink (hidden, handled by digits) */
+.colonBlink {
+  display: none;
+}
+
+/* Screen reflection effect */
+.clockFrame::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    transparent 100%
+  );
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  pointer-events: none;
+}
+
+/* Scanline effect */
+.clockFrame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .clockFrame {
+    padding: var(--space-3) var(--space-5);
+  }
+  
+  .digits {
+    font-size: 2rem;
+    letter-spacing: 2px;
+  }
+  
+  .display {
+    min-width: 100px;
+  }
+}

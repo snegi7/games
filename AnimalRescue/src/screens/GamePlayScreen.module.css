@@ -1,0 +1,296 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  padding: var(--space-4);
+}
+
+.loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+  font-size: var(--text-xl);
+}
+
+.topBar {
+  padding: var(--space-3) var(--space-4);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-2xl);
+  margin-bottom: var(--space-4);
+}
+
+.progressInfo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+.progressLabel {
+  font-weight: 600;
+  color: var(--color-white);
+  font-size: var(--text-sm);
+}
+
+.animalProgress {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.animalDot {
+  font-size: 1.5rem;
+  filter: grayscale(80%);
+  opacity: 0.5;
+  transition: all var(--transition-normal);
+}
+
+.animalDot.saved {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+.animalDot.current {
+  filter: grayscale(0%);
+  opacity: 1;
+  animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.gameArea {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: var(--space-6);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Animal Section */
+.animalSection {
+  display: flex;
+  align-items: center;
+}
+
+.animalCard {
+  width: 100%;
+  text-align: center;
+}
+
+.saveTitle {
+  font-size: var(--text-2xl);
+  color: var(--color-white);
+  margin-bottom: var(--space-4);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.timerSection {
+  margin: var(--space-6) 0;
+  display: flex;
+  justify-content: center;
+}
+
+.questionProgress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.progressText {
+  font-size: var(--text-sm);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Question Section */
+.questionSection {
+  display: flex;
+  align-items: center;
+}
+
+.questionCard {
+  width: 100%;
+  position: relative;
+}
+
+.questionHeader {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+}
+
+.categoryBadge {
+  background: var(--gradient-sunset);
+  color: var(--color-white);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.questionText {
+  font-size: var(--text-2xl);
+  color: var(--color-gray-800);
+  text-align: center;
+  margin-bottom: var(--space-8);
+  min-height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.optionsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+
+.optionButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-white);
+  border: 3px solid var(--color-gray-200);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-family: var(--font-primary);
+  text-align: left;
+}
+
+.optionButton:hover:not(:disabled) {
+  border-color: var(--color-secondary);
+  background: var(--color-gray-100);
+}
+
+.optionButton:disabled {
+  cursor: default;
+}
+
+.optionButton.selected {
+  border-color: var(--color-secondary);
+  background: rgba(78, 205, 196, 0.1);
+}
+
+.optionButton.correct,
+.optionButton.correctAnswer {
+  border-color: var(--color-success);
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.optionButton.incorrect {
+  border-color: var(--color-danger);
+  background: rgba(239, 68, 68, 0.2);
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.optionLetter {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: var(--text-sm);
+  flex-shrink: 0;
+}
+
+.optionText {
+  font-size: var(--text-lg);
+  font-weight: 500;
+  color: var(--color-gray-700);
+}
+
+/* Feedback overlay */
+.feedback {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6);
+  border-radius: var(--radius-2xl);
+  z-index: 10;
+}
+
+.feedbackCorrect {
+  background: rgba(34, 197, 94, 0.95);
+}
+
+.feedbackIncorrect {
+  background: rgba(239, 68, 68, 0.95);
+}
+
+.feedbackIcon {
+  font-size: 3rem;
+}
+
+.feedbackText {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-white);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .gameArea {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  
+  .animalSection {
+    order: 1;
+  }
+  
+  .questionSection {
+    order: 2;
+  }
+  
+  .animalCard {
+    padding: var(--space-4);
+  }
+  
+  .saveTitle {
+    font-size: var(--text-xl);
+  }
+  
+  .questionText {
+    font-size: var(--text-xl);
+    min-height: auto;
+    margin-bottom: var(--space-6);
+  }
+  
+  .optionsGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+  
+  .optionButton {
+    padding: var(--space-3);
+  }
+  
+  .optionText {
+    font-size: var(--text-base);
+  }
+}

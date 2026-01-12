@@ -1,0 +1,128 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--color-white);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-normal);
+}
+
+.emojiContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emoji {
+  display: block;
+  transition: filter var(--transition-normal);
+}
+
+.badge {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  width: 24px;
+  height: 24px;
+  background: var(--color-success);
+  color: var(--color-white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  box-shadow: var(--shadow-md);
+}
+
+.badgeLost {
+  background: var(--color-danger);
+}
+
+.name {
+  font-family: var(--font-primary);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* States */
+.pending .emoji {
+  animation: float 3s ease-in-out infinite;
+}
+
+.saved {
+  background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
+  border: 2px solid var(--color-success);
+}
+
+.lost {
+  background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
+  border: 2px solid var(--color-danger);
+}
+
+.lost .emoji {
+  filter: grayscale(60%);
+}
+
+/* Sizes */
+.sm {
+  padding: var(--space-3);
+}
+
+.sm .emoji {
+  font-size: 2rem;
+}
+
+.sm .name {
+  font-size: var(--text-xs);
+}
+
+.md {
+  padding: var(--space-4);
+}
+
+.md .emoji {
+  font-size: 3rem;
+}
+
+.md .name {
+  font-size: var(--text-sm);
+}
+
+.lg {
+  padding: var(--space-6);
+}
+
+.lg .emoji {
+  font-size: 5rem;
+}
+
+.lg .name {
+  font-size: var(--text-base);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@media (max-width: 640px) {
+  .sm .emoji {
+    font-size: 1.5rem;
+  }
+  
+  .md .emoji {
+    font-size: 2.5rem;
+  }
+  
+  .lg .emoji {
+    font-size: 4rem;
+  }
+}

@@ -1,0 +1,64 @@
+.container {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+  align-items: center;
+}
+
+.pill {
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-normal);
+  font-weight: 700;
+}
+
+/* States */
+.pending {
+  background: var(--color-gray-200);
+  border: 2px dashed var(--color-gray-400);
+}
+
+.completed {
+  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-light) 100%);
+  border: 2px solid var(--color-success);
+  box-shadow: var(--shadow-glow-success);
+  animation: pop 0.3s ease-out;
+}
+
+.checkmark {
+  color: var(--color-white);
+  font-size: 0.8em;
+}
+
+/* Sizes */
+.sm .pill {
+  width: 24px;
+  height: 24px;
+  font-size: var(--text-xs);
+}
+
+.md .pill {
+  width: 36px;
+  height: 36px;
+  font-size: var(--text-sm);
+}
+
+.lg .pill {
+  width: 48px;
+  height: 48px;
+  font-size: var(--text-base);
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
