@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { GameState, OwnedIngredient, GAME_CONFIG, CookingState } from '../types';
+import { GameState, OwnedIngredient, GAME_CONFIG } from '../types';
 import { STARTING_RECIPE_IDS, getRecipeById, RECIPES } from '../data/recipes';
 import { getIngredientById } from '../data/ingredients';
 

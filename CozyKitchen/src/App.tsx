@@ -1,4 +1,3 @@
-import React from 'react';
 import { WalletDisplay } from './components/WalletDisplay';
 import { RecipePanel } from './components/RecipePanel';
 import { CookingArea } from './components/CookingArea';

@@ -9,7 +9,6 @@ export const IngredientPanel: React.FC = () => {
   const cookingState = useGameStore((state) => state.cookingState);
   const droppedIngredients = useGameStore((state) => state.droppedIngredients);
   const disposeIngredient = useGameStore((state) => state.disposeIngredient);
-  const dropIngredient = useGameStore((state) => state.dropIngredient);
   const selectedRecipe = useSelectedRecipe();
   
   const totalIngredients = ownedIngredients.reduce((sum, oi) => sum + oi.quantity, 0);
