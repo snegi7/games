@@ -3,15 +3,15 @@ import { WalletDisplay } from './components/WalletDisplay';
 import { RecipePanel } from './components/RecipePanel';
 import { CookingArea } from './components/CookingArea';
 import { IngredientPanel } from './components/IngredientPanel';
-import { MobileNav } from './components/MobileNav';
+import { MobileRecipeDrawer } from './components/MobileRecipeDrawer';
 import { useGameStore } from './store/gameStore';
-
-type MobileTab = 'recipes' | 'cook' | 'ingredients';
+import { playButtonClick } from './utils/sounds';
 
 function App() {
   const resetGame = useGameStore((state) => state.resetGame);
   const cookingState = useGameStore((state) => state.cookingState);
-  const [activeTab, setActiveTab] = useState<MobileTab>('cook');
+  const unlockedRecipeIds = useGameStore((state) => state.unlockedRecipeIds);
+  const [isRecipeDrawerOpen, setIsRecipeDrawerOpen] = useState(false);
   
   // Show glowing recipe icon when idle (no recipe selected)
   const showRecipeGlow = cookingState.phase === 'idle';
@@ -61,27 +61,51 @@ function App() {
         <IngredientPanel />
       </footer>
       
-      {/* Mobile Layout */}
-      <div className="flex-1 md:hidden overflow-hidden">
-        {activeTab === 'recipes' && (
-          <div className="h-full overflow-auto">
-            <RecipePanel onRecipeSelect={() => setActiveTab('cook')} />
-          </div>
-        )}
-        {activeTab === 'cook' && (
-          <div className="h-full overflow-auto">
-            <CookingArea isMobile />
-          </div>
-        )}
-        {activeTab === 'ingredients' && (
-          <div className="h-full overflow-auto p-2">
-            <IngredientPanel isMobile />
-          </div>
-        )}
+      {/* Mobile Layout - New Design */}
+      <div className="flex-1 md:hidden flex flex-col overflow-hidden">
+        {/* Recipe Button - Top Left */}
+        <div className="p-2 flex-shrink-0">
+          <button
+            onClick={() => {
+              playButtonClick();
+              setIsRecipeDrawerOpen(true);
+            }}
+            className={`
+              flex items-center gap-2 px-3 py-2 rounded-xl
+              bg-gradient-to-r from-purple-400 to-pink-400
+              text-white font-bold shadow-lg
+              hover:scale-105 active:scale-95 transition-all
+              ${showRecipeGlow ? 'animate-pulse ring-4 ring-amber-300 ring-opacity-75' : ''}
+            `}
+          >
+            <span className="text-xl">📖</span>
+            <span className="text-sm">Recipes</span>
+            <span className="bg-white/30 px-2 py-0.5 rounded-full text-xs">
+              {unlockedRecipeIds.length}
+            </span>
+            {showRecipeGlow && (
+              <span className="text-xs animate-bounce">👆</span>
+            )}
+          </button>
+        </div>
+        
+        {/* Cooking Area - Takes remaining space */}
+        <div className="flex-1 overflow-auto min-h-0">
+          <CookingArea isMobile />
+        </div>
+        
+        {/* Ingredient Panel - Always visible at bottom */}
+        <div className="flex-shrink-0 border-t-4 border-orange-300 max-h-[35vh] overflow-auto">
+          <IngredientPanel isMobile />
+        </div>
       </div>
       
-      {/* Mobile Navigation */}
-      <MobileNav activeTab={activeTab} onTabChange={setActiveTab} glowRecipes={showRecipeGlow} />
+      {/* Mobile Recipe Drawer */}
+      <MobileRecipeDrawer 
+        isOpen={isRecipeDrawerOpen}
+        onClose={() => setIsRecipeDrawerOpen(false)}
+        showGlow={showRecipeGlow}
+      />
     </div>
   );
 }
