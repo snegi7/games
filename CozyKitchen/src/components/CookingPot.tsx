@@ -35,7 +35,7 @@ export const CookingPot: React.FC = () => {
   };
 
   // Touch handlers for mobile drag
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  const handleTouchEnd = (_e: React.TouchEvent) => {
     // Handle touch drop is done in the ingredient cards
   };
   
