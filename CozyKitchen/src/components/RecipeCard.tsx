@@ -1,5 +1,6 @@
 import React from 'react';
 import { Recipe } from '../types';
+import { GoldCoin } from './GoldCoin';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -61,7 +62,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
             </span>
             {isUnlocked ? (
               <span className="text-xs font-bold text-green-600 flex items-center gap-1">
-                🪙 +{recipe.sellPrice}
+                <GoldCoin size="xs" animate={false} /> +{recipe.sellPrice}
               </span>
             ) : (
               <span className="text-xs font-bold text-gray-500 flex items-center gap-1">

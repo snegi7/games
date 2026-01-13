@@ -2,6 +2,7 @@ import { useGameStore, useSelectedRecipe } from '../store/gameStore';
 import { getIngredientById } from '../data/ingredients';
 import { IngredientCard } from './IngredientCard';
 import { GAME_CONFIG } from '../types';
+import { playIngredientPickup } from '../utils/sounds';
 
 interface IngredientPanelProps {
   isMobile?: boolean;
@@ -20,6 +21,7 @@ export const IngredientPanel: React.FC<IngredientPanelProps> = ({ isMobile = fal
   const handleDragStart = (e: React.DragEvent, ingredientId: string) => {
     e.dataTransfer.setData('ingredientId', ingredientId);
     e.dataTransfer.effectAllowed = 'move';
+    playIngredientPickup();
   };
   
   return (

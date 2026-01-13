@@ -1,6 +1,8 @@
 import React from 'react';
 import { useGameStore, useMissingIngredients } from '../store/gameStore';
 import { getIngredientById } from '../data/ingredients';
+import { GoldCoin } from './GoldCoin';
+import { playPurchase, playButtonClick } from '../utils/sounds';
 
 interface IngredientShopModalProps {
   onClose: () => void;
@@ -13,7 +15,10 @@ export const IngredientShopModal: React.FC<IngredientShopModalProps> = ({ onClos
   const missingIngredients = useMissingIngredients();
   
   const handleBuy = (ingredientId: string) => {
-    buyIngredient(ingredientId);
+    const success = buyIngredient(ingredientId);
+    if (success) {
+      playPurchase();
+    }
   };
   
   return (
@@ -40,7 +45,7 @@ export const IngredientShopModal: React.FC<IngredientShopModalProps> = ({ onClos
           {/* Wallet display */}
           <div className="flex justify-center mb-4">
             <div className="bg-amber-100 px-4 py-2 rounded-full flex items-center gap-2">
-              <span className="text-xl">🪙</span>
+              <GoldCoin size="sm" />
               <span className="font-bold text-amber-800">{coins}</span>
             </div>
           </div>
@@ -68,7 +73,9 @@ export const IngredientShopModal: React.FC<IngredientShopModalProps> = ({ onClos
                   <span className="text-3xl">{ingredient.emoji}</span>
                   <div className="flex-1">
                     <h4 className="font-bold text-gray-800">{ingredient.name}</h4>
-                    <span className="text-sm text-gray-500">🪙 {ingredient.price}</span>
+                    <span className="text-sm text-gray-500 flex items-center gap-1">
+                      <GoldCoin size="xs" animate={false} /> {ingredient.price}
+                    </span>
                   </div>
                   <button
                     onClick={() => handleBuy(ingredientId)}
@@ -98,7 +105,10 @@ export const IngredientShopModal: React.FC<IngredientShopModalProps> = ({ onClos
           
           {/* Close button */}
           <button
-            onClick={onClose}
+            onClick={() => {
+              playButtonClick();
+              onClose();
+            }}
             className="w-full mt-4 py-3 rounded-xl font-bold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
           >
             Close

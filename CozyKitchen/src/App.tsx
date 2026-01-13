@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { WalletDisplay } from './components/WalletDisplay';
 import { RecipePanel } from './components/RecipePanel';
 import { CookingArea } from './components/CookingArea';
 import { IngredientPanel } from './components/IngredientPanel';
 import { MobileNav } from './components/MobileNav';
-import { OnboardingArrow } from './components/OnboardingArrow';
 import { useGameStore } from './store/gameStore';
 
 type MobileTab = 'recipes' | 'cook' | 'ingredients';
@@ -14,13 +13,8 @@ function App() {
   const cookingState = useGameStore((state) => state.cookingState);
   const [activeTab, setActiveTab] = useState<MobileTab>('cook');
   
-  // Clear onboarding flag on every page load so arrow shows each time
-  useEffect(() => {
-    localStorage.removeItem('cozy-kitchen-onboarding');
-  }, []);
-  
-  // Show onboarding only when idle (no recipe selected)
-  const showOnboarding = cookingState.phase === 'idle';
+  // Show glowing recipe icon when idle (no recipe selected)
+  const showRecipeGlow = cookingState.phase === 'idle';
   
   return (
     <div className="app h-screen w-screen flex flex-col overflow-hidden bg-kitchen-cream font-game">
@@ -53,7 +47,7 @@ function App() {
       <div className="hidden md:flex flex-1 overflow-hidden">
         {/* Left panel - Recipe book */}
         <aside className="w-64 lg:w-72 flex-shrink-0 overflow-hidden">
-          <RecipePanel />
+          <RecipePanel showGlow={showRecipeGlow} />
         </aside>
         
         {/* Center - Cooking area */}
@@ -87,15 +81,7 @@ function App() {
       </div>
       
       {/* Mobile Navigation */}
-      <MobileNav activeTab={activeTab} onTabChange={setActiveTab} />
-      
-      {/* Onboarding arrow for first-time users */}
-      {showOnboarding && (
-        <OnboardingArrow 
-          targetTab="recipes" 
-          message="Start here! Pick a recipe to cook! 👨‍🍳"
-        />
-      )}
+      <MobileNav activeTab={activeTab} onTabChange={setActiveTab} glowRecipes={showRecipeGlow} />
     </div>
   );
 }

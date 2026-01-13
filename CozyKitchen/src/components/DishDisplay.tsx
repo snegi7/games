@@ -2,6 +2,8 @@ import React, { useState, useCallback } from 'react';
 import { useGameStore } from '../store/gameStore';
 import { getRecipeById } from '../data/recipes';
 import { CoinFlyAnimation } from './CoinFlyAnimation';
+import { GoldCoin } from './GoldCoin';
+import { playCoinCollect } from '../utils/sounds';
 
 export const DishDisplay: React.FC = () => {
   const cookingState = useGameStore((state) => state.cookingState);
@@ -19,6 +21,7 @@ export const DishDisplay: React.FC = () => {
   const handleSell = useCallback(() => {
     const earned = sellDish();
     if (earned > 0) {
+      playCoinCollect();
       setEarnedAmount(earned);
       setShowCoins(true);
     }
@@ -41,8 +44,8 @@ export const DishDisplay: React.FC = () => {
         )}
         <div className="dish-display flex flex-col items-center gap-6 animate-pop">
           <div className="text-6xl animate-bounce">🎉</div>
-          <h2 className="text-2xl font-bold text-green-600 font-game">
-            Sold! +🪙{earnedAmount}
+          <h2 className="text-2xl font-bold text-green-600 font-game flex items-center justify-center gap-2">
+            Sold! +<GoldCoin size="md" />{earnedAmount}
           </h2>
         </div>
       </>
@@ -86,7 +89,7 @@ export const DishDisplay: React.FC = () => {
         "
       >
         <span className="flex items-center gap-2">
-          💰 Sell for 🪙 {recipe.sellPrice}
+          💰 Sell for <GoldCoin size="md" animate={false} /> {recipe.sellPrice}
         </span>
       </button>
     </div>

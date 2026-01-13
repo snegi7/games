@@ -4,8 +4,8 @@ import { CookingPot } from './CookingPot';
 import { CookingTimer } from './CookingTimer';
 import { DishDisplay } from './DishDisplay';
 import { IngredientShopModal } from './IngredientShopModal';
-import { MobileIngredientSelector } from './MobileIngredientSelector';
 import { getIngredientById } from '../data/ingredients';
+import { playCookingStart, playButtonClick } from '../utils/sounds';
 
 interface CookingAreaProps {
   isMobile?: boolean;
@@ -49,7 +49,7 @@ export const CookingArea: React.FC<CookingAreaProps> = ({ isMobile = false }) =>
         </div>
         <div className="bg-white/50 rounded-2xl p-3 md:p-4 text-center">
           <span className="text-2xl md:text-3xl block mb-1 md:mb-2">🥘</span>
-          <p className="text-xs md:text-sm text-amber-700">Add ingredients</p>
+          <p className="text-xs md:text-sm text-amber-700">Drag ingredients</p>
         </div>
         <div className="bg-white/50 rounded-2xl p-3 md:p-4 text-center">
           <span className="text-2xl md:text-3xl block mb-1 md:mb-2">💰</span>
@@ -96,7 +96,7 @@ export const CookingArea: React.FC<CookingAreaProps> = ({ isMobile = false }) =>
         {/* Warning about missing ingredients */}
         {missingIngredients.length > 0 && (
           <div className="bg-orange-100 text-orange-700 p-2 md:p-3 rounded-xl mb-3 md:mb-4 text-xs md:text-sm">
-            ⚠️ Missing {missingIngredients.length} ingredient(s)!
+            ⚠️ Missing: {missingIngredients.map(id => getIngredientById(id)?.name).filter(Boolean).join(', ')}
             <button
               onClick={() => setShowShop(true)}
               className="ml-2 underline font-bold hover:text-orange-800"
@@ -108,7 +108,10 @@ export const CookingArea: React.FC<CookingAreaProps> = ({ isMobile = false }) =>
         
         {/* Start cooking button */}
         <button
-          onClick={startCooking}
+          onClick={() => {
+            playButtonClick();
+            startCooking();
+          }}
           className="
             px-6 md:px-8 py-3 md:py-4 rounded-2xl font-bold text-lg md:text-xl
             bg-gradient-to-r from-orange-400 to-pink-500 
@@ -134,18 +137,11 @@ export const CookingArea: React.FC<CookingAreaProps> = ({ isMobile = false }) =>
         </h3>
       </div>
       
-      {/* Cooking pot - smaller on mobile */}
-      <div className={isMobile ? 'scale-75' : ''}>
-        <CookingPot />
-      </div>
-      
-      {/* Mobile ingredient selector */}
-      {isMobile && (
-        <MobileIngredientSelector onOpenShop={() => setShowShop(true)} />
-      )}
+      {/* Cooking pot - BIGGER on all screens */}
+      <CookingPot />
       
       {/* Missing ingredients warning */}
-      {hasDroppedAllAvailable && !isMobile && (
+      {hasDroppedAllAvailable && (
         <div className="bg-orange-100 text-orange-700 p-4 rounded-2xl text-center max-w-sm">
           <p className="font-bold mb-2">🛒 Missing ingredients!</p>
           <p className="text-sm mb-3">You need to buy more ingredients to complete this dish.</p>
@@ -161,7 +157,10 @@ export const CookingArea: React.FC<CookingAreaProps> = ({ isMobile = false }) =>
       {/* Action buttons */}
       <div className="flex gap-3 md:gap-4 mt-2 md:mt-4">
         <button
-          onClick={resetCooking}
+          onClick={() => {
+            playButtonClick();
+            resetCooking();
+          }}
           className="px-4 md:px-6 py-2 md:py-3 rounded-xl font-bold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors text-sm md:text-base"
         >
           ← Cancel
@@ -169,7 +168,10 @@ export const CookingArea: React.FC<CookingAreaProps> = ({ isMobile = false }) =>
         
         {canCook && (
           <button
-            onClick={cook}
+            onClick={() => {
+              playCookingStart();
+              cook();
+            }}
             className="
               px-6 md:px-8 py-2 md:py-3 rounded-2xl font-bold text-base md:text-lg
               bg-gradient-to-r from-green-400 to-emerald-500 
@@ -189,9 +191,7 @@ export const CookingArea: React.FC<CookingAreaProps> = ({ isMobile = false }) =>
   
   const renderCookingState = () => (
     <div className="flex flex-col items-center justify-center h-full gap-4 md:gap-6 p-4 md:p-8">
-      <div className={isMobile ? 'scale-75' : ''}>
-        <CookingPot />
-      </div>
+      <CookingPot />
       <CookingTimer />
     </div>
   );

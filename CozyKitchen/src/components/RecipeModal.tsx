@@ -2,6 +2,8 @@ import React from 'react';
 import { Recipe } from '../types';
 import { useGameStore } from '../store/gameStore';
 import { getIngredientById } from '../data/ingredients';
+import { GoldCoin } from './GoldCoin';
+import { playUnlock, playButtonClick } from '../utils/sounds';
 
 interface RecipeModalProps {
   recipe: Recipe;
@@ -16,6 +18,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ recipe, onClose }) => 
   
   const handleUnlock = () => {
     if (unlockRecipe(recipe.id)) {
+      playUnlock();
       onClose();
     }
   };
@@ -29,7 +32,10 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ recipe, onClose }) => 
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-400 to-pink-400 p-6 text-center relative">
           <button 
-            onClick={onClose}
+            onClick={() => {
+              playButtonClick();
+              onClose();
+            }}
             className="absolute top-4 right-4 text-white/80 hover:text-white text-2xl"
           >
             ✕
@@ -64,7 +70,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ recipe, onClose }) => 
             <div className="text-center">
               <span className="text-sm text-gray-500">Sells for</span>
               <div className="text-xl font-bold text-green-600 flex items-center justify-center gap-1">
-                🪙 +{recipe.sellPrice}
+                <GoldCoin size="sm" animate={false} /> +{recipe.sellPrice}
               </div>
             </div>
             <div className="text-center">
@@ -89,11 +95,11 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ recipe, onClose }) => 
           >
             {canAfford ? (
               <span className="flex items-center justify-center gap-2">
-                🔓 Unlock for 🪙 {recipe.unlockPrice}
+                🔓 Unlock for <GoldCoin size="sm" animate={false} /> {recipe.unlockPrice}
               </span>
             ) : (
               <span className="flex items-center justify-center gap-2">
-                Need 🪙 {recipe.unlockPrice - coins} more
+                Need <GoldCoin size="sm" animate={false} /> {recipe.unlockPrice - coins} more
               </span>
             )}
           </button>

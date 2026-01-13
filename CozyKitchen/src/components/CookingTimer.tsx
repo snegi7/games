@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useGameStore } from '../store/gameStore';
 import { GAME_CONFIG } from '../types';
+import { playDishReady } from '../utils/sounds';
 
 export const CookingTimer: React.FC = () => {
   const cookingState = useGameStore((state) => state.cookingState);
@@ -21,6 +22,7 @@ export const CookingTimer: React.FC = () => {
       if (cookingState.phase === 'cooking') {
         const newTime = cookingState.timeRemaining - 1;
         if (newTime <= 0) {
+          playDishReady();
           finishCooking();
         } else {
           updateCookingTimer(newTime);

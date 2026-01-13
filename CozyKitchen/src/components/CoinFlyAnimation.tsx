@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { GoldCoin } from './GoldCoin';
+import { playSingleCoin } from '../utils/sounds';
 
 interface CoinFlyAnimationProps {
   amount: number;
@@ -44,6 +45,8 @@ export const CoinFlyAnimation: React.FC<CoinFlyAnimationProps> = ({ amount, onCo
         id: i,
         delay: i * 100, // Slightly longer delay for better visual
       });
+      // Play coin sound for each flying coin
+      playSingleCoin(i * 100 + 400); // Offset to match animation landing
     }
     
     setCoins(newCoins);
