@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { GameState, OwnedIngredient, GAME_CONFIG } from '../types';
 import { STARTING_RECIPE_IDS, getRecipeById, RECIPES } from '../data/recipes';
 import { getIngredientById } from '../data/ingredients';
@@ -55,9 +54,8 @@ const initialState: GameState = {
 };
 
 export const useGameStore = create<GameStore>()(
-  persist(
-    (set, get) => ({
-      ...initialState,
+  (set, get) => ({
+    ...initialState,
       
       // Coin management
       addCoins: (amount) => set((state) => ({ coins: state.coins + amount })),
@@ -265,15 +263,11 @@ export const useGameStore = create<GameStore>()(
         });
       },
       
-      // Game state
-      resetGame: () => {
-        set(initialState);
-      },
-    }),
-    {
-      name: 'cozy-kitchen-game',
-    }
-  )
+    // Game state
+    resetGame: () => {
+      set(initialState);
+    },
+  })
 );
 
 // Selector hooks for derived state
