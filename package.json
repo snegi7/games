@@ -1,0 +1,22 @@
+{
+  "name": "satyarth-games",
+  "private": true,
+  "version": "1.0.0",
+  "description": "A portfolio of handcrafted browser games",
+  "workspaces": [
+    "packages/*",
+    "AnimalRescue",
+    "CozyKitchen"
+  ],
+  "scripts": {
+    "dev:animal": "npm run dev --workspace=animal-rescue",
+    "dev:kitchen": "npm run dev --workspace=cozy-kitchen",
+    "build:animal": "npm run build --workspace=animal-rescue",
+    "build:kitchen": "npm run build --workspace=cozy-kitchen",
+    "build:all": "npm run build --workspaces",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "devDependencies": {
+    "typescript": "~5.6.2"
+  }
+}
