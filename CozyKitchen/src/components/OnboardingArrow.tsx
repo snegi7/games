@@ -167,8 +167,6 @@ export const OnboardingArrow: React.FC<OnboardingArrowProps> = ({ message }) => 
           </div>
         </div>
         
-        {/* Highlight box around recipe panel header */}
-        <div className="absolute top-12 left-0 w-64 lg:w-72 h-16 border-4 border-amber-400 bg-amber-100/30 rounded-lg pointer-events-none animate-pulse" />
       </div>
     </>
   );

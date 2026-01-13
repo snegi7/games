@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { WalletDisplay } from './components/WalletDisplay';
 import { RecipePanel } from './components/RecipePanel';
 import { CookingArea } from './components/CookingArea';
@@ -13,6 +13,11 @@ function App() {
   const resetGame = useGameStore((state) => state.resetGame);
   const cookingState = useGameStore((state) => state.cookingState);
   const [activeTab, setActiveTab] = useState<MobileTab>('cook');
+  
+  // Clear onboarding flag on every page load so arrow shows each time
+  useEffect(() => {
+    localStorage.removeItem('cozy-kitchen-onboarding');
+  }, []);
   
   // Show onboarding only when idle (no recipe selected)
   const showOnboarding = cookingState.phase === 'idle';
