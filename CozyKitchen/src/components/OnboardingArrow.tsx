@@ -114,21 +114,18 @@ export const OnboardingArrow: React.FC<OnboardingArrowProps> = ({ message }) => 
   return (
     <>
       {/* Mobile: Arrow pointing down to recipes tab */}
-      <div 
-        className="md:hidden fixed inset-0 z-40"
-        onClick={handleDismiss}
-      >
-        {/* Semi-transparent overlay */}
-        <div className="absolute inset-0 bg-black/20" />
-        
+      <div className="md:hidden fixed inset-0 z-40 pointer-events-none">
         {/* Message bubble and arrow - positioned to point to LEFT side (Recipes tab) */}
-        <div className="absolute bottom-36 left-[15%] flex flex-col items-center">
+        <div className="absolute bottom-36 left-[15%] flex flex-col items-center pointer-events-auto">
           {/* Message bubble */}
-          <div className="bg-white rounded-3xl px-6 py-4 shadow-2xl border-4 border-amber-400 max-w-[300px] text-center mb-2">
+          <div 
+            className="bg-white rounded-3xl px-6 py-4 shadow-2xl border-4 border-amber-400 max-w-[300px] text-center mb-2 cursor-pointer"
+            onClick={handleDismiss}
+          >
             <p className="text-xl font-bold text-amber-800 font-game leading-tight">
               {message}
             </p>
-            <p className="text-sm text-gray-500 mt-2">Tap anywhere to dismiss</p>
+            <p className="text-sm text-gray-500 mt-2">Tap to dismiss</p>
           </div>
           
           {/* Bouncing mustard arrow pointing down */}
@@ -138,35 +135,31 @@ export const OnboardingArrow: React.FC<OnboardingArrowProps> = ({ message }) => 
         </div>
         
         {/* Spotlight on recipes tab - positioned on the LEFT */}
-        <div className="absolute bottom-2 left-[8%] pointer-events-none">
+        <div className="absolute bottom-2 left-[8%]">
           <div className="w-16 h-16 rounded-full border-4 border-amber-400 animate-pulse bg-amber-100/50" />
         </div>
       </div>
       
       {/* Desktop: Arrow pointing to recipe panel header */}
-      <div 
-        className="hidden md:block fixed inset-0 z-40"
-        onClick={handleDismiss}
-      >
-        {/* Semi-transparent overlay */}
-        <div className="absolute inset-0 bg-black/20" />
-        
+      <div className="hidden md:block fixed inset-0 z-40 pointer-events-none">
         {/* Arrow and message positioned near recipe panel header */}
-        <div className="absolute top-20 left-72 lg:left-80 flex items-center gap-3">
+        <div className="absolute top-20 left-72 lg:left-80 flex items-center gap-3 pointer-events-auto">
           {/* Bouncing mustard arrow pointing left */}
           <div className="animate-bounce-arrow-horizontal">
             <MustardArrowLeft />
           </div>
           
           {/* Message bubble */}
-          <div className="bg-white rounded-3xl px-8 py-5 shadow-2xl border-4 border-amber-400 max-w-sm">
+          <div 
+            className="bg-white rounded-3xl px-8 py-5 shadow-2xl border-4 border-amber-400 max-w-sm cursor-pointer"
+            onClick={handleDismiss}
+          >
             <p className="text-2xl font-bold text-amber-800 font-game leading-tight">
               {message}
             </p>
-            <p className="text-base text-gray-500 mt-2">Click anywhere to dismiss</p>
+            <p className="text-base text-gray-500 mt-2">Click to dismiss</p>
           </div>
         </div>
-        
       </div>
     </>
   );
