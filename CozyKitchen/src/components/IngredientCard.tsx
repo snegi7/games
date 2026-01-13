@@ -1,3 +1,4 @@
+import { useRef, useCallback } from 'react';
 import { Ingredient } from '../types';
 
 interface IngredientCardProps {
@@ -7,6 +8,9 @@ interface IngredientCardProps {
   isDisabled?: boolean;
   isDraggable?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
+  onTouchDragStart?: (ingredientId: string, emoji: string, x: number, y: number) => void;
+  onTouchDragMove?: (x: number, y: number) => void;
+  onTouchDragEnd?: () => void;
   onDispose?: () => void;
   showDisposeButton?: boolean;
   compact?: boolean;
@@ -19,10 +23,49 @@ export const IngredientCard: React.FC<IngredientCardProps> = ({
   isDisabled = false,
   isDraggable = false,
   onDragStart,
+  onTouchDragStart,
+  onTouchDragMove,
+  onTouchDragEnd,
   onDispose,
   showDisposeButton = false,
   compact = false,
 }) => {
+  const isDraggingRef = useRef(false);
+  const startPosRef = useRef({ x: 0, y: 0 });
+  
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (!isDraggable || isDisabled || !onTouchDragStart) return;
+    
+    const touch = e.touches[0];
+    startPosRef.current = { x: touch.clientX, y: touch.clientY };
+    
+    // Start drag immediately - no delay needed
+    isDraggingRef.current = true;
+    onTouchDragStart(ingredient.id, ingredient.emoji, touch.clientX, touch.clientY);
+    
+    // Prevent scrolling while dragging
+    e.preventDefault();
+  }, [isDraggable, isDisabled, onTouchDragStart, ingredient.id, ingredient.emoji]);
+  
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isDraggingRef.current || !onTouchDragMove) return;
+    
+    const touch = e.touches[0];
+    onTouchDragMove(touch.clientX, touch.clientY);
+    
+    // Prevent scrolling
+    e.preventDefault();
+  }, [onTouchDragMove]);
+  
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!isDraggingRef.current) return;
+    
+    isDraggingRef.current = false;
+    onTouchDragEnd?.();
+    
+    e.preventDefault();
+  }, [onTouchDragEnd]);
+  
   return (
     <div
       className={`
@@ -34,10 +77,13 @@ export const IngredientCard: React.FC<IngredientCardProps> = ({
             ? 'bg-gray-200 opacity-50 cursor-not-allowed'
             : 'bg-gradient-to-br from-kitchen-cream to-kitchen-peach hover:scale-105 hover:shadow-lg border-4 border-orange-200'
         }
-        ${isDraggable && !isDisabled ? 'cursor-grab active:cursor-grabbing' : ''}
+        ${isDraggable && !isDisabled ? 'cursor-grab active:cursor-grabbing touch-none' : ''}
       `}
       draggable={isDraggable && !isDisabled}
       onDragStart={onDragStart}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Quantity badge */}
       {quantity > 1 && (

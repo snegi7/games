@@ -6,6 +6,7 @@ import { IngredientPanel } from './components/IngredientPanel';
 import { MobileRecipeDrawer } from './components/MobileRecipeDrawer';
 import { useGameStore } from './store/gameStore';
 import { playButtonClick } from './utils/sounds';
+import { TouchDragProvider } from './contexts/TouchDragContext';
 
 function App() {
   const resetGame = useGameStore((state) => state.resetGame);
@@ -17,6 +18,7 @@ function App() {
   const showRecipeGlow = cookingState.phase === 'idle';
   
   return (
+    <TouchDragProvider>
     <div className="app h-screen w-screen flex flex-col overflow-hidden bg-kitchen-cream font-game">
       {/* Header */}
       <header className="flex items-center justify-between px-3 md:px-6 py-2 md:py-3 bg-gradient-to-r from-pink-400 via-orange-400 to-yellow-400 shadow-lg">
@@ -94,8 +96,8 @@ function App() {
           <CookingArea isMobile />
         </div>
         
-        {/* Ingredient Panel - Always visible at bottom */}
-        <div className="flex-shrink-0 border-t-4 border-orange-300 max-h-[35vh] overflow-auto">
+        {/* Ingredient Panel - Always visible at bottom, no clipping */}
+        <div className="flex-shrink-0 border-t-4 border-orange-300">
           <IngredientPanel isMobile />
         </div>
       </div>
@@ -107,6 +109,7 @@ function App() {
         showGlow={showRecipeGlow}
       />
     </div>
+    </TouchDragProvider>
   );
 }
 
