@@ -1,4 +1,3 @@
-import React from 'react';
 import { useGameStore } from '../store/gameStore';
 
 export const WalletDisplay: React.FC = () => {
@@ -7,10 +6,10 @@ export const WalletDisplay: React.FC = () => {
   return (
     <div 
       id="wallet-display"
-      className="wallet-display flex items-center gap-3 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 px-6 py-3 rounded-full shadow-lg border-4 border-amber-600"
+      className="wallet-display flex items-center gap-1.5 md:gap-3 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 px-3 md:px-6 py-1.5 md:py-3 rounded-full shadow-lg border-2 md:border-4 border-amber-600"
     >
-      <span className="text-3xl animate-bounce-slow">🪙</span>
-      <span className="text-2xl font-bold text-amber-900 font-game">
+      <span className="text-xl md:text-3xl animate-bounce-slow">🪙</span>
+      <span className="text-lg md:text-2xl font-bold text-amber-900 font-game">
         {coins.toLocaleString()}
       </span>
     </div>

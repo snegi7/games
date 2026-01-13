@@ -1,10 +1,13 @@
-import React from 'react';
 import { useGameStore, useSelectedRecipe } from '../store/gameStore';
 import { getIngredientById } from '../data/ingredients';
 import { IngredientCard } from './IngredientCard';
 import { GAME_CONFIG } from '../types';
 
-export const IngredientPanel: React.FC = () => {
+interface IngredientPanelProps {
+  isMobile?: boolean;
+}
+
+export const IngredientPanel: React.FC<IngredientPanelProps> = ({ isMobile = false }) => {
   const ownedIngredients = useGameStore((state) => state.ownedIngredients);
   const cookingState = useGameStore((state) => state.cookingState);
   const droppedIngredients = useGameStore((state) => state.droppedIngredients);
@@ -20,12 +23,12 @@ export const IngredientPanel: React.FC = () => {
   };
   
   return (
-    <div className="ingredient-panel bg-gradient-to-t from-amber-100 to-orange-50 border-t-4 border-orange-300 p-4">
+    <div className={`ingredient-panel bg-gradient-to-t from-amber-100 to-orange-50 ${isMobile ? '' : 'border-t-4 border-orange-300'} p-3 md:p-4 h-full`}>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-lg font-bold text-amber-800 font-game flex items-center gap-2">
+        <h3 className="text-base md:text-lg font-bold text-amber-800 font-game flex items-center gap-2">
           🧺 My Ingredients
         </h3>
-        <span className="text-sm font-medium text-amber-600 bg-amber-200 px-3 py-1 rounded-full">
+        <span className="text-xs md:text-sm font-medium text-amber-600 bg-amber-200 px-2 md:px-3 py-1 rounded-full">
           {totalIngredients} / {GAME_CONFIG.MAX_INGREDIENTS}
         </span>
       </div>
@@ -37,7 +40,7 @@ export const IngredientPanel: React.FC = () => {
           <p className="text-sm">Select a recipe to see what you need.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
+        <div className={`grid ${isMobile ? 'grid-cols-4 sm:grid-cols-5' : 'grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10'} gap-2 md:gap-3`}>
           {ownedIngredients.map((owned) => {
             const ingredient = getIngredientById(owned.ingredientId);
             if (!ingredient) return null;
@@ -54,10 +57,11 @@ export const IngredientPanel: React.FC = () => {
                 quantity={owned.quantity}
                 isHighlighted={isHighlighted}
                 isDisabled={isDisabled}
-                isDraggable={isCooking && isNeededForRecipe && !alreadyDropped}
+                isDraggable={!isMobile && isCooking && isNeededForRecipe && !alreadyDropped}
                 onDragStart={(e) => handleDragStart(e, owned.ingredientId)}
                 onDispose={() => disposeIngredient(owned.ingredientId)}
                 showDisposeButton={!isCooking}
+                compact={isMobile}
               />
             );
           })}

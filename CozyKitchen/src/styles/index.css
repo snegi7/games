@@ -259,7 +259,8 @@ body {
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .recipe-panel {
-    width: 200px !important;
+    width: 100% !important;
+    border-right: none !important;
   }
   
   .ingredient-panel {
@@ -272,6 +273,40 @@ body {
   
   .ingredient-card span:first-child {
     font-size: 1.5rem;
+  }
+  
+  /* Smaller cooking pot on mobile */
+  .cooking-pot {
+    transform: scale(0.8);
+  }
+}
+
+/* Safe area for mobile devices with notches */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* Prevent pull-to-refresh on mobile */
+html, body {
+  overscroll-behavior: none;
+}
+
+/* Touch-friendly tap targets */
+@media (pointer: coarse) {
+  button, .recipe-card, .ingredient-card {
+    min-height: 44px;
+  }
+}
+
+/* Mobile landscape mode */
+@media (max-height: 500px) and (orientation: landscape) {
+  .cooking-pot {
+    transform: scale(0.6);
+  }
+  
+  header {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
   }
 }
 

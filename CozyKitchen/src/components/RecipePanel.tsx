@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useGameStore, useAllRecipesSorted } from '../store/gameStore';
 import { RecipeCard } from './RecipeCard';
 import { RecipeModal } from './RecipeModal';
 import { Recipe } from '../types';
 
-export const RecipePanel: React.FC = () => {
+interface RecipePanelProps {
+  onRecipeSelect?: () => void;
+}
+
+export const RecipePanel: React.FC<RecipePanelProps> = ({ onRecipeSelect }) => {
   const selectedRecipeId = useGameStore((state) => state.selectedRecipeId);
   const unlockedRecipeIds = useGameStore((state) => state.unlockedRecipeIds);
   const selectRecipe = useGameStore((state) => state.selectRecipe);
@@ -25,15 +29,16 @@ export const RecipePanel: React.FC = () => {
         selectRecipe(null);
       } else {
         selectRecipe(recipe.id);
+        onRecipeSelect?.();
       }
     }
   };
   
   return (
     <>
-      <div className="recipe-panel bg-gradient-to-b from-purple-100 to-pink-50 border-r-4 border-purple-300 h-full flex flex-col">
-        <div className="p-4 border-b-2 border-purple-200 bg-gradient-to-r from-purple-200 to-pink-200">
-          <h2 className="text-xl font-bold text-purple-800 font-game flex items-center gap-2">
+      <div className="recipe-panel bg-gradient-to-b from-purple-100 to-pink-50 md:border-r-4 border-purple-300 h-full flex flex-col">
+        <div className="p-3 md:p-4 border-b-2 border-purple-200 bg-gradient-to-r from-purple-200 to-pink-200">
+          <h2 className="text-lg md:text-xl font-bold text-purple-800 font-game flex items-center gap-2">
             📖 Recipe Book
           </h2>
           <p className="text-xs text-purple-600 mt-1">
@@ -41,7 +46,7 @@ export const RecipePanel: React.FC = () => {
           </p>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-3 space-y-2">
+        <div className="flex-1 overflow-y-auto p-2 md:p-3 space-y-2">
           {recipes.map((recipe) => (
             <RecipeCard
               key={recipe.id}

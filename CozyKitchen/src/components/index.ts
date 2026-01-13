@@ -10,3 +10,5 @@ export { CookingArea } from './CookingArea';
 export { DishDisplay } from './DishDisplay';
 export { CoinFlyAnimation } from './CoinFlyAnimation';
 export { IngredientShopModal } from './IngredientShopModal';
+export { MobileNav } from './MobileNav';
+export { MobileIngredientSelector } from './MobileIngredientSelector';
