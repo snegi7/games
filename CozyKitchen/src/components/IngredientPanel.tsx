@@ -57,7 +57,7 @@ export const IngredientPanel: React.FC<IngredientPanelProps> = ({ isMobile = fal
                 quantity={owned.quantity}
                 isHighlighted={isHighlighted}
                 isDisabled={isDisabled}
-                isDraggable={!isMobile && isCooking && isNeededForRecipe && !alreadyDropped}
+                isDraggable={isCooking && isNeededForRecipe && !alreadyDropped}
                 onDragStart={(e) => handleDragStart(e, owned.ingredientId)}
                 onDispose={() => disposeIngredient(owned.ingredientId)}
                 showDisposeButton={!isCooking}

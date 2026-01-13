@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { GoldCoin } from './GoldCoin';
 
 interface CoinFlyAnimationProps {
   amount: number;
@@ -41,7 +42,7 @@ export const CoinFlyAnimation: React.FC<CoinFlyAnimationProps> = ({ amount, onCo
     for (let i = 0; i < numCoins; i++) {
       newCoins.push({
         id: i,
-        delay: i * 80,
+        delay: i * 100, // Slightly longer delay for better visual
       });
     }
     
@@ -51,7 +52,7 @@ export const CoinFlyAnimation: React.FC<CoinFlyAnimationProps> = ({ amount, onCo
     const timer = setTimeout(() => {
       setCompleted(true);
       onComplete();
-    }, numCoins * 80 + 800);
+    }, numCoins * 100 + 1000);
     
     return () => clearTimeout(timer);
   }, [amount, onComplete]);
@@ -67,15 +68,21 @@ export const CoinFlyAnimation: React.FC<CoinFlyAnimationProps> = ({ amount, onCo
       {coins.map((coin) => (
         <div
           key={coin.id}
-          className="absolute text-4xl"
+          className="absolute"
           style={{
             left: startPosition.x,
             top: startPosition.y,
             transform: 'translate(-50%, -50%)',
-            animation: `coinFlyToWallet-${coin.id} 0.8s ease-out ${coin.delay}ms forwards`,
+            animation: `coinFlyToWallet-${coin.id} 1s ease-out ${coin.delay}ms forwards`,
           }}
         >
-          🪙
+          <div className="relative">
+            <GoldCoin size="lg" animate={false} />
+            {/* Sparkle effect */}
+            <div className="absolute inset-0 animate-ping opacity-50">
+              <GoldCoin size="lg" animate={false} />
+            </div>
+          </div>
         </div>
       ))}
       
@@ -83,21 +90,28 @@ export const CoinFlyAnimation: React.FC<CoinFlyAnimationProps> = ({ amount, onCo
         ${coins.map((coin) => `
           @keyframes coinFlyToWallet-${coin.id} {
             0% {
-              transform: translate(-50%, -50%) scale(1);
+              transform: translate(-50%, -50%) scale(1) rotate(0deg);
               opacity: 1;
             }
-            40% {
+            30% {
               transform: translate(
-                calc(-50% + ${deltaX * 0.3}px), 
-                calc(-50% + ${deltaY * 0.5 - 50}px)
-              ) scale(1.3);
+                calc(-50% + ${deltaX * 0.2}px), 
+                calc(-50% + ${deltaY * 0.4 - 80}px)
+              ) scale(1.5) rotate(180deg);
+              opacity: 1;
+            }
+            70% {
+              transform: translate(
+                calc(-50% + ${deltaX * 0.7}px), 
+                calc(-50% + ${deltaY * 0.8}px)
+              ) scale(1) rotate(360deg);
               opacity: 1;
             }
             100% {
               transform: translate(
                 calc(-50% + ${deltaX}px), 
                 calc(-50% + ${deltaY}px)
-              ) scale(0.3);
+              ) scale(0.5) rotate(540deg);
               opacity: 0;
             }
           }

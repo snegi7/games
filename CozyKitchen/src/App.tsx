@@ -4,13 +4,18 @@ import { RecipePanel } from './components/RecipePanel';
 import { CookingArea } from './components/CookingArea';
 import { IngredientPanel } from './components/IngredientPanel';
 import { MobileNav } from './components/MobileNav';
+import { OnboardingArrow } from './components/OnboardingArrow';
 import { useGameStore } from './store/gameStore';
 
 type MobileTab = 'recipes' | 'cook' | 'ingredients';
 
 function App() {
   const resetGame = useGameStore((state) => state.resetGame);
+  const cookingState = useGameStore((state) => state.cookingState);
   const [activeTab, setActiveTab] = useState<MobileTab>('cook');
+  
+  // Show onboarding only when idle (no recipe selected)
+  const showOnboarding = cookingState.phase === 'idle';
   
   return (
     <div className="app h-screen w-screen flex flex-col overflow-hidden bg-kitchen-cream font-game">
@@ -78,6 +83,14 @@ function App() {
       
       {/* Mobile Navigation */}
       <MobileNav activeTab={activeTab} onTabChange={setActiveTab} />
+      
+      {/* Onboarding arrow for first-time users */}
+      {showOnboarding && (
+        <OnboardingArrow 
+          targetTab="recipes" 
+          message="Start here! Pick a recipe to cook! 👨‍🍳"
+        />
+      )}
     </div>
   );
 }

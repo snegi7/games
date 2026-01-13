@@ -12,3 +12,5 @@ export { CoinFlyAnimation } from './CoinFlyAnimation';
 export { IngredientShopModal } from './IngredientShopModal';
 export { MobileNav } from './MobileNav';
 export { MobileIngredientSelector } from './MobileIngredientSelector';
+export { GoldCoin, GoldCoinStack } from './GoldCoin';
+export { OnboardingArrow } from './OnboardingArrow';
