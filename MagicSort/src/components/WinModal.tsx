@@ -63,7 +63,7 @@ export default function WinModal() {
         <p className="text-sm mb-6" style={{ color: '#6b7280' }}>
           Completed in{' '}
           <span style={{ color: '#c084fc', fontWeight: 700 }}>{moveCount} moves</span>
-          {moveLimit && (
+          {moveLimit !== null && (
             <> out of <span style={{ color: '#94a3b8', fontWeight: 700 }}>{moveLimit}</span></>
           )}{' '}
           on <span style={{ color: '#e2e8f0', fontWeight: 700, textTransform: 'capitalize' }}>{difficulty}</span>
