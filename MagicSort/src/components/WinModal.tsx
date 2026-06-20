@@ -12,14 +12,14 @@ export default function WinModal() {
   const startGame = useGameStore(s => s.startGame);
   const goHome = useGameStore(s => s.goHome);
 
-  if (gameStatus !== 'won' || !difficulty) return null;
-
   const confettiOffsets = useRef(
     CONFETTI_COLORS.map(() => ({
       x: (Math.random() - 0.5) * 300,
       y: (Math.random() - 0.5) * 300,
     }))
   );
+
+  if (gameStatus !== 'won' || !difficulty) return null;
 
   const moveLimit = DIFFICULTY_CONFIGS[difficulty].moveLimit;
 
