@@ -9,6 +9,7 @@ interface AnimInfo {
   toX: number; toY: number;
   color: Color;
   pourToRight: boolean;
+  pourOffsetX: number;
 }
 
 export default function TubeBoard() {
@@ -33,13 +34,16 @@ export default function TubeBoard() {
     if (!fromEl || !toEl) { completePour(); return; }
     const fromRect = fromEl.getBoundingClientRect();
     const toRect = toEl.getBoundingClientRect();
+    const fromCX = fromRect.left + fromRect.width / 2 - boardRect.left;
+    const toCX   = toRect.left   + toRect.width   / 2 - boardRect.left;
     setAnimInfo({
-      fromX: fromRect.left + fromRect.width / 2 - boardRect.left,
+      fromX: fromCX,
       fromY: fromRect.top - boardRect.top,
-      toX: toRect.left + toRect.width / 2 - boardRect.left,
-      toY: toRect.top - boardRect.top,
+      toX:   toCX,
+      toY:   toRect.top - boardRect.top,
       color: pendingPour.color,
       pourToRight: toRect.left >= fromRect.left,
+      pourOffsetX: toCX - fromCX,
     });
   }, [pendingPour, completePour]);
 
@@ -69,25 +73,31 @@ export default function TubeBoard() {
       className="relative flex flex-wrap justify-center gap-4 md:gap-5 px-4 py-6"
       style={{ maxWidth: 720, margin: '0 auto' }}
     >
-      {tubes.map((tube, i) => (
-        <Tube
-          key={i}
-          ref={el => { tubeRefs.current[i] = el; }}
-          tube={tube}
-          index={i}
-          isSelected={selectedTube === i}
-          onClick={() => selectTube(i)}
-          tubeWidth={tubeWidth}
-          tubeHeight={tubeHeight}
-          isPouringFrom={animInfo !== null && pendingPour?.fromIdx === i}
-          pourToRight={animInfo?.pourToRight ?? false}
-        />
-      ))}
+      {tubes.map((tube, i) => {
+        const isFrom = animInfo !== null && pendingPour?.fromIdx === i;
+        return (
+          <Tube
+            key={i}
+            ref={el => { tubeRefs.current[i] = el; }}
+            tube={tube}
+            index={i}
+            isSelected={selectedTube === i}
+            onClick={() => selectTube(i)}
+            tubeWidth={tubeWidth}
+            tubeHeight={tubeHeight}
+            isPouringFrom={isFrom}
+            pourToRight={animInfo?.pourToRight ?? false}
+            pourOffsetX={isFrom ? (animInfo?.pourOffsetX ?? 0) : 0}
+          />
+        );
+      })}
 
       {animInfo && (
         <PourAnimation
-          {...animInfo}
-          tubeHeight={tubeHeight}
+          fromY={animInfo.fromY}
+          toX={animInfo.toX}
+          toY={animInfo.toY}
+          color={animInfo.color}
           onComplete={handleAnimComplete}
         />
       )}

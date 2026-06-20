@@ -13,27 +13,36 @@ interface TubeProps {
   tubeHeight: number;
   isPouringFrom?: boolean;
   pourToRight?: boolean;
+  pourOffsetX?: number;
 }
 
+const LIFT_PX = 70;
+
 const Tube = forwardRef<HTMLDivElement, TubeProps>(
-  ({ tube, index, isSelected, onClick, tubeWidth, tubeHeight, isPouringFrom, pourToRight }, ref) => {
+  ({ tube, index, isSelected, onClick, tubeWidth, tubeHeight, isPouringFrom, pourToRight, pourOffsetX }, ref) => {
     const sorted = isTubeSorted(tube, TUBE_CAPACITY);
     const empty = tube.length === 0;
 
     return (
       <motion.div
         className="relative flex flex-col items-center cursor-pointer select-none"
-        style={{ width: tubeWidth, height: tubeHeight + 14, transformOrigin: 'center bottom' }}
+        style={{
+          width: tubeWidth,
+          height: tubeHeight + 14,
+          transformOrigin: 'center bottom',
+          zIndex: isPouringFrom ? 100 : undefined,
+        }}
         animate={{
-          y: isPouringFrom ? -28 : isSelected ? -10 : 0,
-          rotate: isPouringFrom ? (pourToRight ? 28 : -28) : 0,
+          x: isPouringFrom ? (pourOffsetX ?? 0) : 0,
+          y: isPouringFrom ? -LIFT_PX : isSelected ? -10 : 0,
+          rotate: isPouringFrom ? (pourToRight ? 22 : -22) : 0,
           filter: isSelected
             ? 'drop-shadow(0 0 12px rgba(192,132,252,0.9))'
             : sorted
             ? 'drop-shadow(0 0 10px rgba(74,222,128,0.7))'
             : 'drop-shadow(0 0 0px transparent)',
         }}
-        transition={{ type: 'spring', stiffness: 320, damping: 26 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 22 }}
         whileTap={{ scale: 0.96 }}
         role="button"
         aria-label={`Tube ${index + 1}`}
