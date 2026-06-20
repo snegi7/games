@@ -1,0 +1,94 @@
+<h2>How many tubes should each difficulty have?</h2>
+<p class="subtitle">Each tube holds 4 color segments. The extra empty tubes give the player room to maneuver.</p>
+
+<style>
+  .tube-grid { display: flex; gap: 8px; align-items: flex-end; justify-content: center; flex-wrap: wrap; margin: 12px 0; }
+  .tube { width: 30px; height: 90px; border: 2px solid rgba(255,255,255,0.4); border-radius: 0 0 14px 14px; border-top: none; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; background: rgba(255,255,255,0.05); }
+  .tube.empty { background: rgba(255,255,255,0.03); }
+  .seg { height: 22px; width: 100%; }
+  .tag { font-size: 11px; color: #aaa; text-align: center; margin-top: 4px; }
+  .diff-label { font-size: 13px; font-weight: 700; letter-spacing: 1px; margin-bottom: 6px; }
+  .diff-label.easy { color: #4ade80; }
+  .diff-label.medium { color: #facc15; }
+  .diff-label.hard { color: #f87171; }
+  .tube-preview { padding: 14px; border-radius: 10px; background: rgba(255,255,255,0.04); }
+</style>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Classic (4 / 6 / 8 colors)</h3>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;">
+        <div class="tube-preview">
+          <div class="diff-label easy">EASY</div>
+          <div class="tube-grid">
+            <div class="tube"><div class="seg" style="background:#4ade80"></div><div class="seg" style="background:#f87171"></div><div class="seg" style="background:#60a5fa"></div><div class="seg" style="background:#facc15"></div></div>
+            <div class="tube"><div class="seg" style="background:#facc15"></div><div class="seg" style="background:#4ade80"></div><div class="seg" style="background:#f87171"></div><div class="seg" style="background:#60a5fa"></div></div>
+            <div class="tube"><div class="seg" style="background:#60a5fa"></div><div class="seg" style="background:#facc15"></div><div class="seg" style="background:#4ade80"></div><div class="seg" style="background:#f87171"></div></div>
+            <div class="tube"><div class="seg" style="background:#f87171"></div><div class="seg" style="background:#60a5fa"></div><div class="seg" style="background:#facc15"></div><div class="seg" style="background:#4ade80"></div></div>
+            <div class="tube empty"></div>
+            <div class="tube empty"></div>
+          </div>
+          <div class="tag">4 colors · 6 tubes</div>
+        </div>
+        <div class="tube-preview">
+          <div class="diff-label medium">MEDIUM</div>
+          <div class="tube-grid">
+            <div class="tube"><div class="seg" style="background:#4ade80"></div><div class="seg" style="background:#f87171"></div><div class="seg" style="background:#60a5fa"></div><div class="seg" style="background:#facc15"></div></div>
+            <div class="tube"><div class="seg" style="background:#c084fc"></div><div class="seg" style="background:#4ade80"></div><div class="seg" style="background:#fb923c"></div><div class="seg" style="background:#60a5fa"></div></div>
+            <div class="tube"><div class="seg" style="background:#60a5fa"></div><div class="seg" style="background:#facc15"></div><div class="seg" style="background:#c084fc"></div><div class="seg" style="background:#f87171"></div></div>
+            <div class="tube"><div class="seg" style="background:#f87171"></div><div class="seg" style="background:#60a5fa"></div><div class="seg" style="background:#4ade80"></div><div class="seg" style="background:#fb923c"></div></div>
+            <div class="tube"><div class="seg" style="background:#fb923c"></div><div class="seg" style="background:#c084fc"></div><div class="seg" style="background:#facc15"></div><div class="seg" style="background:#4ade80"></div></div>
+            <div class="tube"><div class="seg" style="background:#facc15"></div><div class="seg" style="background:#fb923c"></div><div class="seg" style="background:#f87171"></div><div class="seg" style="background:#c084fc"></div></div>
+            <div class="tube empty"></div>
+            <div class="tube empty"></div>
+          </div>
+          <div class="tag">6 colors · 8 tubes · max 40 moves</div>
+        </div>
+        <div class="tube-preview">
+          <div class="diff-label hard">HARD</div>
+          <div class="tube-grid">
+            <div class="tube"><div class="seg" style="background:#4ade80"></div><div class="seg" style="background:#f87171"></div><div class="seg" style="background:#60a5fa"></div><div class="seg" style="background:#facc15"></div></div>
+            <div class="tube"><div class="seg" style="background:#c084fc"></div><div class="seg" style="background:#4ade80"></div><div class="seg" style="background:#fb923c"></div><div class="seg" style="background:#60a5fa"></div></div>
+            <div class="tube"><div class="seg" style="background:#f472b6"></div><div class="seg" style="background:#facc15"></div><div class="seg" style="background:#c084fc"></div><div class="seg" style="background:#f87171"></div></div>
+            <div class="tube"><div class="seg" style="background:#f87171"></div><div class="seg" style="background:#2dd4bf"></div><div class="seg" style="background:#4ade80"></div><div class="seg" style="background:#fb923c"></div></div>
+            <div class="tube"><div class="seg" style="background:#fb923c"></div><div class="seg" style="background:#c084fc"></div><div class="seg" style="background:#f472b6"></div><div class="seg" style="background:#4ade80"></div></div>
+            <div class="tube"><div class="seg" style="background:#facc15"></div><div class="seg" style="background:#fb923c"></div><div class="seg" style="background:#f87171"></div><div class="seg" style="background:#c084fc"></div></div>
+            <div class="tube"><div class="seg" style="background:#2dd4bf"></div><div class="seg" style="background:#f472b6"></div><div class="seg" style="background:#facc15"></div><div class="seg" style="background:#2dd4bf"></div></div>
+            <div class="tube"><div class="seg" style="background:#60a5fa"></div><div class="seg" style="background:#60a5fa"></div><div class="seg" style="background:#fb923c"></div><div class="seg" style="background:#f472b6"></div></div>
+            <div class="tube empty"></div>
+            <div class="tube empty"></div>
+          </div>
+          <div class="tag">8 colors · 10 tubes · max 60 moves</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Gentle Ramp (3 / 5 / 7 colors)</h3>
+      <p>Slightly easier across the board — good for casual players. Easy has only 3 colors so first-timers can learn the mechanic quickly.</p>
+      <div style="margin-top:8px;display:flex;gap:12px;font-size:12px;color:#aaa;flex-wrap:wrap;">
+        <span>Easy: 3 colors · 5 tubes</span>
+        <span>Medium: 5 colors · 7 tubes · max 35 moves</span>
+        <span>Hard: 7 colors · 9 tubes · max 50 moves</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Steep Ramp (4 / 7 / 11 colors)</h3>
+      <p>Bigger jump from Medium to Hard — for players who want a real challenge at the top end. Hard becomes very large and complex.</p>
+      <div style="margin-top:8px;display:flex;gap:12px;font-size:12px;color:#aaa;flex-wrap:wrap;">
+        <span>Easy: 4 colors · 6 tubes</span>
+        <span>Medium: 7 colors · 9 tubes · max 55 moves</span>
+        <span>Hard: 11 colors · 13 tubes · max 80 moves</span>
+      </div>
+    </div>
+  </div>
+</div>
