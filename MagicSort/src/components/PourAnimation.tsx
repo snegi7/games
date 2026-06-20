@@ -46,7 +46,6 @@ export default function PourAnimation({
 
     const total    = Math.max(40, count * 30);
     const emitRate = total / EMIT_DUR;
-    const dir      = pourToRight ? 1 : -1;
     const hex      = COLOR_SOLID[color];
 
     // How long until we expect all particles to have been emitted AND fallen
