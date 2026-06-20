@@ -12,7 +12,7 @@ interface TubeProps {
 }
 
 const Tube = forwardRef<HTMLDivElement, TubeProps>(
-  ({ tube, isSelected, onClick }, ref) => {
+  ({ tube, index, isSelected, onClick }, ref) => {
     const sorted = isTubeSorted(tube, TUBE_CAPACITY);
     const empty = tube.length === 0;
 
@@ -25,11 +25,13 @@ const Tube = forwardRef<HTMLDivElement, TubeProps>(
             ? 'drop-shadow(0 0 12px rgba(192,132,252,0.9))'
             : sorted
             ? 'drop-shadow(0 0 10px rgba(74,222,128,0.7))'
-            : 'none',
+            : 'drop-shadow(0 0 0px transparent)',
         }}
         transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-        onClick={onClick}
         whileTap={{ scale: 0.96 }}
+        role="button"
+        aria-label={`Tube ${index + 1}`}
+        onClick={onClick}
       >
         {/* Metallic rim */}
         <div
