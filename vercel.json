@@ -1,11 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "npm install",
-  "buildCommand": "mkdir -p dist && cp index.html styles.css dist/ && cp -r assets dist/ && cd AnimalRescue && npm run build && cp -r dist ../dist/AnimalRescue && cd ../CozyKitchen && npm run build && cp -r dist ../dist/CozyKitchen",
+  "buildCommand": "mkdir -p dist && cp index.html styles.css dist/ && cp -r assets dist/ && cd AnimalRescue && npm run build && cp -r dist ../dist/AnimalRescue && cd ../CozyKitchen && npm run build && cp -r dist ../dist/CozyKitchen && cd ../MagicSort && npm run build && cp -r dist ../dist/MagicSort",
   "outputDirectory": "dist",
   "rewrites": [
     { "source": "/CozyKitchen/(.*)", "destination": "/CozyKitchen/index.html" },
-    { "source": "/AnimalRescue/(.*)", "destination": "/AnimalRescue/index.html" }
+    { "source": "/AnimalRescue/(.*)", "destination": "/AnimalRescue/index.html" },
+    { "source": "/MagicSort/(.*)", "destination": "/MagicSort/index.html" }
   ],
   "headers": [
     {
@@ -22,6 +23,12 @@
     },
     {
       "source": "/CozyKitchen/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/MagicSort/assets/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
