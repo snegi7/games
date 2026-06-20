@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "A portfolio of handcrafted browser games",
+  "engines": { "node": ">=20" },
   "workspaces": [
     "packages/*",
     "AnimalRescue",
