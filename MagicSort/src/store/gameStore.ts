@@ -136,8 +136,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   undo: () => {
-    const { history, moveCount, moveLimit, isPouring } = get();
-    if (isPouring || history.length === 0) return;
+    const { history, moveCount, moveLimit, isPouring, gameStatus } = get();
+    if (isPouring || history.length === 0 || gameStatus !== 'playing') return;
     const prevTubes = history[history.length - 1];
     const newMoveCount = moveLimit !== null ? moveCount + 1 : moveCount;
     const lost = moveLimit !== null && newMoveCount >= moveLimit;
