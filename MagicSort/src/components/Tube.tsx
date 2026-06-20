@@ -22,6 +22,24 @@ const Tube = forwardRef<HTMLDivElement, TubeProps>(
     const sorted = isTubeSorted(tube, TUBE_CAPACITY);
     const empty = tube.length === 0;
 
+    // Two-phase pour animation:
+    //   Phase 1 (0 → TILT_DELAY): slide center-to-center, lift — spring-like (easeOut)
+    //   Phase 2 (TILT_DELAY → end): x slides back by H·sinT·dir, rotate tilts — both easeIn
+    // This keeps the rim approximately above destCenterX throughout the tilt.
+    const H      = tubeHeight + 14;
+    const sinT   = Math.sin(TILT_DEG * Math.PI / 180);
+    const dirVal = (pourToRight ?? false) ? 1 : -1;
+    const cx     = pourOffsetX ?? 0;
+    const fx     = cx - H * sinT * dirVal;
+    const dur    = TILT_DELAY + EMIT_DUR;
+    const t1     = TILT_DELAY / dur;
+
+    const filterVal = isSelected
+      ? 'drop-shadow(0 0 12px rgba(192,132,252,0.9))'
+      : sorted
+      ? 'drop-shadow(0 0 10px rgba(74,222,128,0.7))'
+      : 'drop-shadow(0 0 0px transparent)';
+
     return (
       <motion.div
         className="relative flex flex-col items-center cursor-pointer select-none"
@@ -31,23 +49,23 @@ const Tube = forwardRef<HTMLDivElement, TubeProps>(
           transformOrigin: 'center bottom',
           zIndex: isPouringFrom ? 100 : undefined,
         }}
-        animate={{
-          x: isPouringFrom ? (pourOffsetX ?? 0) : 0,
-          y: isPouringFrom ? -LIFT_PX : isSelected ? -10 : 0,
-          rotate: isPouringFrom ? (pourToRight ? TILT_DEG : -TILT_DEG) : 0,
-          filter: isSelected
-            ? 'drop-shadow(0 0 12px rgba(192,132,252,0.9))'
-            : sorted
-            ? 'drop-shadow(0 0 10px rgba(74,222,128,0.7))'
-            : 'drop-shadow(0 0 0px transparent)',
+        animate={isPouringFrom ? {
+          x:      [0, cx, fx],
+          y:      -LIFT_PX,
+          rotate: [0, 0, pourToRight ? TILT_DEG : -TILT_DEG],
+          filter: filterVal,
+        } : {
+          x: 0,
+          y: isSelected ? -10 : 0,
+          rotate: 0,
+          filter: filterVal,
         }}
-        transition={{
-          x:      { type: 'spring', stiffness: 200, damping: 22 },
+        transition={isPouringFrom ? {
+          x:      { duration: dur, times: [0, t1, 1], ease: ['easeOut', 'easeIn'] },
           y:      { type: 'spring', stiffness: 200, damping: 22 },
-          rotate: isPouringFrom
-            ? { type: 'tween', duration: EMIT_DUR, ease: 'easeIn', delay: TILT_DELAY }
-            : { type: 'spring', stiffness: 200, damping: 22 },
-        }}
+          rotate: { duration: dur, times: [0, t1, 1], ease: ['linear', 'easeIn'] },
+          filter: { duration: 0 },
+        } : { type: 'spring', stiffness: 200, damping: 22 }}
         whileTap={{ scale: 0.96 }}
         role="button"
         aria-label={`Tube ${index + 1}`}

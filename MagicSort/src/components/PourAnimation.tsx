@@ -59,13 +59,14 @@ export default function PourAnimation({
     let rafId: number;
     let lastTs = performance.now();
 
-    // Current rim position given elapsed time since emission started.
-    // Matches the easeIn tween on Tube's rotate property.
+    // Current rim position — x is always pivotX (= destCenterX) since TubeBoard's
+    // keyframe animation compensates the tube's x translation to cancel out the
+    // sin(θ) drift. Canvas just drops particles straight down from destCenterX.
     function rimAt(emitT: number): { x: number; y: number } {
       const tiltT   = easeIn(Math.min(emitT / EMIT_DUR, 1));
       const tiltRad = tiltT * MAX_TILT;
       return {
-        x: pivotX + H * Math.sin(tiltRad) * dir,
+        x: pivotX,
         y: pivotY - H * Math.cos(tiltRad),
       };
     }
