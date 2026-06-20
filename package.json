@@ -6,13 +6,16 @@
   "workspaces": [
     "packages/*",
     "AnimalRescue",
-    "CozyKitchen"
+    "CozyKitchen",
+    "MagicSort"
   ],
   "scripts": {
     "dev:animal": "npm run dev --workspace=animal-rescue",
     "dev:kitchen": "npm run dev --workspace=cozy-kitchen",
+    "dev:magic": "npm run dev --workspace=magic-sort",
     "build:animal": "npm run build --workspace=animal-rescue",
     "build:kitchen": "npm run build --workspace=cozy-kitchen",
+    "build:magic": "npm run build --workspace=magic-sort",
     "build:all": "npm run build --workspaces",
     "lint": "npm run lint --workspaces --if-present"
   },
