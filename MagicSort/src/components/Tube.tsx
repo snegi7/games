@@ -17,10 +17,11 @@ interface TubeProps {
   pourOffsetX?: number;
   incomingColor?: Color;
   incomingCount?: number;
+  leavingCount?: number;
 }
 
 const Tube = forwardRef<HTMLDivElement, TubeProps>(
-  ({ tube, index, isSelected, onClick, tubeWidth, tubeHeight, isPouringFrom, pourToRight, pourOffsetX, incomingColor, incomingCount }, ref) => {
+  ({ tube, index, isSelected, onClick, tubeWidth, tubeHeight, isPouringFrom, pourToRight, pourOffsetX, incomingColor, incomingCount, leavingCount }, ref) => {
     const sorted = isTubeSorted(tube, TUBE_CAPACITY);
     const empty = tube.length === 0;
 
@@ -142,12 +143,16 @@ const Tube = forwardRef<HTMLDivElement, TubeProps>(
           />
 
           {/* Color segments (bottom → top order via column-reverse) */}
-          {tube.map((color, i) => (
+          {tube.map((color, i) => {
+            const isLeaving = isPouringFrom && leavingCount !== undefined && i >= tube.length - leavingCount;
+            return (
             <motion.div
               key={`${i}-${color}`}
               initial={{ scaleY: 0, originY: 1 }}
-              animate={{ scaleY: 1 }}
-              transition={{ duration: 0.22, ease: 'easeOut', delay: i * 0.03 }}
+              animate={{ scaleY: isLeaving ? 0 : 1 }}
+              transition={isLeaving
+                ? { duration: EMIT_DUR, ease: 'easeIn', delay: TILT_DELAY }
+                : { duration: 0.22, ease: 'easeOut', delay: i * 0.03 }}
               style={{
                 flex: `0 0 ${100 / TUBE_CAPACITY}%`,
                 background: COLOR_GRADIENTS[color],
@@ -167,7 +172,8 @@ const Tube = forwardRef<HTMLDivElement, TubeProps>(
                 }}
               />
             </motion.div>
-          ))}
+            );
+          })}
 
           {/* Incoming liquid — rises from top of existing content during pour */}
           {incomingColor !== undefined && incomingCount !== undefined && (

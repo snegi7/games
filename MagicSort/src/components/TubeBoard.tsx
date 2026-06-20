@@ -127,6 +127,7 @@ export default function TubeBoard() {
             pourOffsetX={isFrom ? (animInfo?.pourOffsetX ?? 0) : 0}
             incomingColor={isTo ? animInfo?.color : undefined}
             incomingCount={isTo ? animInfo?.count : undefined}
+            leavingCount={isFrom ? animInfo?.count : undefined}
           />
         );
       })}
