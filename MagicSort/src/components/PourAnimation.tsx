@@ -2,11 +2,14 @@ import { useEffect, useRef } from 'react';
 import { COLOR_SOLID } from '../types';
 import type { Color } from '../types';
 
-export const LIFT_PX  = 80;
-export const TILT_DEG = 22;
+export const LIFT_PX    = 140;   // how high the tube lifts (px)
+export const TILT_DEG   = 42;    // max tilt angle (degrees)
+export const TILT_DELAY = 0.30;  // seconds to wait while tube travels before tilting/emitting
+export const EMIT_DUR   = 0.90;  // seconds over which all drops are emitted
 
-const GRAVITY    = 2200;   // px/s²
-const TILT_DELAY = 0.32;   // seconds before first drop (tube is traveling)
+const GRAVITY   = 2200;
+const MAX_TILT  = TILT_DEG * (Math.PI / 180);
+const easeIn    = (t: number) => t * t;          // matches Framer Motion 'easeIn'
 
 interface Particle {
   x: number; y: number;
@@ -16,92 +19,101 @@ interface Particle {
 }
 
 interface Props {
-  emitX:  number;   // viewport x — center of dest tube (source tube moved here)
-  emitY:  number;   // viewport y — tube opening after lift
-  destY:  number;   // viewport y — top of destination tube glass body
-  color:  Color;
-  count:  number;   // color units being poured (1–4)
+  pivotX:     number;   // viewport x — tube bottom-center after translate (= dest center x)
+  pivotY:     number;   // viewport y — tube bottom-center after lift
+  H:          number;   // tube outer height (tubeHeight + 14)
+  destY:      number;   // viewport y — top of destination tube (absorption line)
+  pourToRight: boolean;
+  color:      Color;
+  count:      number;   // color units being poured (1–4)
   onComplete: () => void;
 }
 
-export default function PourAnimation({ emitX, emitY, destY, color, count, onComplete }: Props) {
+export default function PourAnimation({
+  pivotX, pivotY, H, destY, pourToRight, color, count, onComplete,
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
-    // Match device pixels exactly so particles are crisp
     const dpr = window.devicePixelRatio || 1;
     canvas.width  = window.innerWidth  * dpr;
     canvas.height = window.innerHeight * dpr;
     canvas.style.width  = `${window.innerWidth}px`;
     canvas.style.height = `${window.innerHeight}px`;
-
     const ctx = canvas.getContext('2d')!;
     ctx.scale(dpr, dpr);
 
-    const total     = Math.max(35, count * 28);
-    const emitDur   = 0.95;                  // seconds to emit all drops
-    const emitRate  = total / emitDur;
+    const total    = Math.max(40, count * 30);
+    const emitRate = total / EMIT_DUR;
+    const dir      = pourToRight ? 1 : -1;
+    const hex      = COLOR_SOLID[color];
+
+    // How long until we expect all particles to have been emitted AND fallen
+    const TOTAL_DUR = TILT_DELAY + EMIT_DUR + 0.6;
 
     const particles: Particle[] = [];
-    let emitted     = 0;
-    let emitElapsed = 0;
-    let tiltElapsed = 0;
+    let totalElapsed = 0;
+    let emitElapsed  = 0;
+    let emitted      = 0;
     let rafId: number;
-    let lastTs      = performance.now();
+    let lastTs = performance.now();
 
-    const hex = COLOR_SOLID[color];
+    // Current rim position given elapsed time since emission started.
+    // Matches the easeIn tween on Tube's rotate property.
+    function rimAt(emitT: number): { x: number; y: number } {
+      const tiltT   = easeIn(Math.min(emitT / EMIT_DUR, 1));
+      const tiltRad = tiltT * MAX_TILT;
+      return {
+        x: pivotX + H * Math.sin(tiltRad) * dir,
+        y: pivotY - H * Math.cos(tiltRad),
+      };
+    }
 
     function loop(ts: number) {
       const dt = Math.min((ts - lastTs) / 1000, 0.05);
       lastTs = ts;
+      totalElapsed += dt;
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-      // Wait for tube to travel and tilt before emitting
-      if (tiltElapsed < TILT_DELAY) {
-        tiltElapsed += dt;
-        rafId = requestAnimationFrame(loop);
-        return;
+      // Wait for tube to travel before emitting
+      if (totalElapsed >= TILT_DELAY) {
+        emitElapsed += dt;
+        const rim    = rimAt(emitElapsed);
+        const target = Math.min(total, Math.round(emitElapsed * emitRate));
+
+        while (emitted < target) {
+          particles.push({
+            x:  rim.x + (Math.random() - 0.5) * 12,
+            y:  rim.y,
+            vx: (Math.random() - 0.5) * 90,
+            vy: 20 + Math.random() * 80,
+            r:  3 + Math.random() * 3.5,
+            done: false,
+          });
+          emitted++;
+        }
       }
 
-      // Emit drops gradually
-      emitElapsed += dt;
-      const target = Math.min(total, Math.round(emitElapsed * emitRate));
-      while (emitted < target) {
-        particles.push({
-          x:  emitX + (Math.random() - 0.5) * 14,
-          y:  emitY,
-          vx: (Math.random() - 0.5) * 120,
-          vy: 30 + Math.random() * 80,
-          r:  3 + Math.random() * 3,
-          done: false,
-        });
-        emitted++;
-      }
-
-      // Physics update + draw
+      // Physics + draw
       let alive = 0;
       ctx.shadowColor = hex;
-      ctx.shadowBlur  = 10;
+      ctx.shadowBlur  = 12;
 
       for (const p of particles) {
         if (p.done) continue;
-
         p.vy += GRAVITY * dt;
-        p.x  += p.vx * dt;
-        p.y  += p.vy * dt;
-
+        p.x  += p.vx   * dt;
+        p.y  += p.vy   * dt;
         if (p.y >= destY) { p.done = true; continue; }
 
         alive++;
-
-        // Stretch drop in direction of travel (teardrop at speed)
         const speed   = Math.hypot(p.vx, p.vy);
-        const stretch = Math.min(3.2, 1 + speed / 480);
+        const stretch = Math.min(3.5, 1 + speed / 450);
         const angle   = Math.atan2(p.vy, p.vx);
 
         ctx.save();
-        ctx.globalAlpha = 0.92;
+        ctx.globalAlpha = 0.93;
         ctx.fillStyle   = hex;
         ctx.translate(p.x, p.y);
         ctx.rotate(angle);
@@ -111,7 +123,7 @@ export default function PourAnimation({ emitX, emitY, destY, color, count, onCom
         ctx.restore();
       }
 
-      if (emitted >= total && alive === 0) {
+      if (totalElapsed >= TOTAL_DUR && alive === 0) {
         ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
         onComplete();
         return;

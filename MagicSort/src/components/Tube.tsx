@@ -3,7 +3,7 @@ import { forwardRef } from 'react';
 import type { Color } from '../types';
 import { COLOR_GRADIENTS, TUBE_CAPACITY } from '../types';
 import { isTubeSorted } from '../utils/winChecker';
-import { LIFT_PX, TILT_DEG } from './PourAnimation';
+import { LIFT_PX, TILT_DEG, EMIT_DUR, TILT_DELAY } from './PourAnimation';
 
 interface TubeProps {
   tube: Color[];
@@ -41,7 +41,13 @@ const Tube = forwardRef<HTMLDivElement, TubeProps>(
             ? 'drop-shadow(0 0 10px rgba(74,222,128,0.7))'
             : 'drop-shadow(0 0 0px transparent)',
         }}
-        transition={{ type: 'spring', stiffness: 200, damping: 22 }}
+        transition={{
+          x:      { type: 'spring', stiffness: 200, damping: 22 },
+          y:      { type: 'spring', stiffness: 200, damping: 22 },
+          rotate: isPouringFrom
+            ? { type: 'tween', duration: EMIT_DUR, ease: 'easeIn', delay: TILT_DELAY }
+            : { type: 'spring', stiffness: 200, damping: 22 },
+        }}
         whileTap={{ scale: 0.96 }}
         role="button"
         aria-label={`Tube ${index + 1}`}
