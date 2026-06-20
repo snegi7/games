@@ -7,32 +7,36 @@ export function generatePuzzle(difficulty: Difficulty): Color[][] {
   const config = DIFFICULTY_CONFIGS[difficulty];
   const colors = ALL_COLORS.slice(0, config.colors);
 
-  // Build solved state
-  let tubes: Color[][] = [
-    ...colors.map(c => Array<Color>(TUBE_CAPACITY).fill(c)),
-    ...Array.from({ length: config.emptyTubes }, () => [] as Color[]),
-  ];
+  for (let attempt = 0; attempt < 10; attempt++) {
+    // Build solved state
+    let tubes: Color[][] = [
+      ...colors.map(c => Array<Color>(TUBE_CAPACITY).fill(c)),
+      ...Array.from({ length: config.emptyTubes }, () => [] as Color[]),
+    ];
 
-  // Scramble with random valid single-segment pours
-  const iterations = config.colors * TUBE_CAPACITY * 20;
-  for (let i = 0; i < iterations; i++) {
-    const candidates: [number, number][] = [];
-    for (let f = 0; f < tubes.length; f++) {
-      for (let t = 0; t < tubes.length; t++) {
-        if (f !== t && localIsValidPour(tubes[f], tubes[t], TUBE_CAPACITY)) {
-          candidates.push([f, t]);
+    // Scramble with random valid single-segment pours
+    // Single-segment moves (not batch) give finer-grained shuffling
+    const iterations = config.colors * TUBE_CAPACITY * 20;
+    for (let i = 0; i < iterations; i++) {
+      const candidates: [number, number][] = [];
+      for (let f = 0; f < tubes.length; f++) {
+        for (let t = 0; t < tubes.length; t++) {
+          if (f !== t && localIsValidPour(tubes[f], tubes[t], TUBE_CAPACITY)) {
+            candidates.push([f, t]);
+          }
         }
       }
+      if (candidates.length === 0) break;
+      const [f, t] = candidates[Math.floor(Math.random() * candidates.length)];
+      const next = tubes.map(tube => [...tube]);
+      next[t].push(next[f].pop()!);
+      tubes = next;
     }
-    if (candidates.length === 0) break;
-    const [f, t] = candidates[Math.floor(Math.random() * candidates.length)];
-    const next = tubes.map(tube => [...tube]);
-    next[t].push(next[f].pop()!);
-    tubes = next;
+
+    if (!checkWin(tubes, TUBE_CAPACITY)) return tubes;
   }
 
-  if (checkWin(tubes, TUBE_CAPACITY)) return generatePuzzle(difficulty);
-  return tubes;
+  throw new Error(`generatePuzzle: failed to produce unsolved state after 10 attempts (difficulty: ${difficulty})`);
 }
 
 function localIsValidPour(from: Color[], to: Color[], capacity: number): boolean {
