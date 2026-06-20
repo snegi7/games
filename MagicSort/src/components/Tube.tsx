@@ -9,16 +9,19 @@ interface TubeProps {
   index: number;
   isSelected: boolean;
   onClick: () => void;
+  tubeWidth: number;
+  tubeHeight: number;
 }
 
 const Tube = forwardRef<HTMLDivElement, TubeProps>(
-  ({ tube, index, isSelected, onClick }, ref) => {
+  ({ tube, index, isSelected, onClick, tubeWidth, tubeHeight }, ref) => {
     const sorted = isTubeSorted(tube, TUBE_CAPACITY);
     const empty = tube.length === 0;
 
     return (
       <motion.div
         className="relative flex flex-col items-center cursor-pointer select-none"
+        style={{ width: tubeWidth, height: tubeHeight + 14 }}
         animate={{
           y: isSelected ? -10 : 0,
           filter: isSelected
@@ -66,7 +69,7 @@ const Tube = forwardRef<HTMLDivElement, TubeProps>(
           ref={ref}
           style={{
             width: '100%',
-            height: '100%',
+            flex: 1,
             display: 'flex',
             flexDirection: 'column-reverse', // index 0 = visual bottom
             borderRadius: '0 0 50% 50% / 0 0 20px 20px',

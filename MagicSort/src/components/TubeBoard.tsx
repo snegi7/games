@@ -46,11 +46,14 @@ export default function TubeBoard() {
     completePour();
   }, [completePour]);
 
-  const calcTubeWidth = (perRow: number) =>
-    Math.min(52, Math.floor((Math.min(window.innerWidth, 480) - 40) / perRow - 12));
+  const calcTubeWidth = (perRow: number) => {
+    const available = Math.min(window.innerWidth, 700) - 40;
+    const natural = Math.floor(available / perRow - 16);
+    return Math.min(100, Math.max(44, natural));
+  };
 
   const [tubeWidth, setTubeWidth] = useState(() => calcTubeWidth(tubesPerRow));
-  const tubeHeight = Math.round(tubeWidth * 2.4);
+  const tubeHeight = Math.round(tubeWidth * 3);
 
   useEffect(() => {
     const onResize = () => setTubeWidth(calcTubeWidth(tubesPerRow));
@@ -61,23 +64,20 @@ export default function TubeBoard() {
   return (
     <div
       ref={boardRef}
-      className="relative flex flex-wrap justify-center gap-3 md:gap-4 px-4 py-6"
-      style={{ maxWidth: 560, margin: '0 auto' }}
+      className="relative flex flex-wrap justify-center gap-4 md:gap-5 px-4 py-6"
+      style={{ maxWidth: 720, margin: '0 auto' }}
     >
       {tubes.map((tube, i) => (
-        <div
+        <Tube
           key={i}
-          style={{ width: tubeWidth, height: tubeHeight + 14 }}
-          className="flex flex-col"
-        >
-          <Tube
-            ref={el => { tubeRefs.current[i] = el; }}
-            tube={tube}
-            index={i}
-            isSelected={selectedTube === i}
-            onClick={() => selectTube(i)}
-          />
-        </div>
+          ref={el => { tubeRefs.current[i] = el; }}
+          tube={tube}
+          index={i}
+          isSelected={selectedTube === i}
+          onClick={() => selectTube(i)}
+          tubeWidth={tubeWidth}
+          tubeHeight={tubeHeight}
+        />
       ))}
 
       {animInfo && (
