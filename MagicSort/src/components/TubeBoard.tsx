@@ -8,6 +8,7 @@ interface AnimInfo {
   fromX: number; fromY: number;
   toX: number; toY: number;
   color: Color;
+  pourToRight: boolean;
 }
 
 export default function TubeBoard() {
@@ -38,6 +39,7 @@ export default function TubeBoard() {
       toX: toRect.left + toRect.width / 2 - boardRect.left,
       toY: toRect.top - boardRect.top,
       color: pendingPour.color,
+      pourToRight: toRect.left >= fromRect.left,
     });
   }, [pendingPour, completePour]);
 
@@ -77,12 +79,15 @@ export default function TubeBoard() {
           onClick={() => selectTube(i)}
           tubeWidth={tubeWidth}
           tubeHeight={tubeHeight}
+          isPouringFrom={animInfo !== null && pendingPour?.fromIdx === i}
+          pourToRight={animInfo?.pourToRight ?? false}
         />
       ))}
 
       {animInfo && (
         <PourAnimation
           {...animInfo}
+          tubeHeight={tubeHeight}
           onComplete={handleAnimComplete}
         />
       )}

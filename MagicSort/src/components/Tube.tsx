@@ -11,26 +11,29 @@ interface TubeProps {
   onClick: () => void;
   tubeWidth: number;
   tubeHeight: number;
+  isPouringFrom?: boolean;
+  pourToRight?: boolean;
 }
 
 const Tube = forwardRef<HTMLDivElement, TubeProps>(
-  ({ tube, index, isSelected, onClick, tubeWidth, tubeHeight }, ref) => {
+  ({ tube, index, isSelected, onClick, tubeWidth, tubeHeight, isPouringFrom, pourToRight }, ref) => {
     const sorted = isTubeSorted(tube, TUBE_CAPACITY);
     const empty = tube.length === 0;
 
     return (
       <motion.div
         className="relative flex flex-col items-center cursor-pointer select-none"
-        style={{ width: tubeWidth, height: tubeHeight + 14 }}
+        style={{ width: tubeWidth, height: tubeHeight + 14, transformOrigin: 'center bottom' }}
         animate={{
-          y: isSelected ? -10 : 0,
+          y: isPouringFrom ? -28 : isSelected ? -10 : 0,
+          rotate: isPouringFrom ? (pourToRight ? 28 : -28) : 0,
           filter: isSelected
             ? 'drop-shadow(0 0 12px rgba(192,132,252,0.9))'
             : sorted
             ? 'drop-shadow(0 0 10px rgba(74,222,128,0.7))'
             : 'drop-shadow(0 0 0px transparent)',
         }}
-        transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+        transition={{ type: 'spring', stiffness: 320, damping: 26 }}
         whileTap={{ scale: 0.96 }}
         role="button"
         aria-label={`Tube ${index + 1}`}
