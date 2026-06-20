@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react';
 import { COLOR_SOLID } from '../types';
 import type { Color } from '../types';
 
-export const LIFT_PX = 80;
+export const LIFT_PX  = 80;
+export const TILT_DEG = 22;
 
 const GRAVITY    = 2200;   // px/s²
 const TILT_DELAY = 0.32;   // seconds before first drop (tube is traveling)

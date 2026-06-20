@@ -3,6 +3,7 @@ import { forwardRef } from 'react';
 import type { Color } from '../types';
 import { COLOR_GRADIENTS, TUBE_CAPACITY } from '../types';
 import { isTubeSorted } from '../utils/winChecker';
+import { LIFT_PX, TILT_DEG } from './PourAnimation';
 
 interface TubeProps {
   tube: Color[];
@@ -15,8 +16,6 @@ interface TubeProps {
   pourToRight?: boolean;
   pourOffsetX?: number;
 }
-
-const LIFT_PX = 80;
 
 const Tube = forwardRef<HTMLDivElement, TubeProps>(
   ({ tube, index, isSelected, onClick, tubeWidth, tubeHeight, isPouringFrom, pourToRight, pourOffsetX }, ref) => {
@@ -35,7 +34,7 @@ const Tube = forwardRef<HTMLDivElement, TubeProps>(
         animate={{
           x: isPouringFrom ? (pourOffsetX ?? 0) : 0,
           y: isPouringFrom ? -LIFT_PX : isSelected ? -10 : 0,
-          rotate: isPouringFrom ? (pourToRight ? 22 : -22) : 0,
+          rotate: isPouringFrom ? (pourToRight ? TILT_DEG : -TILT_DEG) : 0,
           filter: isSelected
             ? 'drop-shadow(0 0 12px rgba(192,132,252,0.9))'
             : sorted

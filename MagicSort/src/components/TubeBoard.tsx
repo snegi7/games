@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { useGameStore } from '../store/gameStore';
 import Tube from './Tube';
-import PourAnimation, { LIFT_PX } from './PourAnimation';
+import PourAnimation, { LIFT_PX, TILT_DEG } from './PourAnimation';
 import type { Color } from '../types';
 
 interface AnimInfo {
@@ -63,17 +63,37 @@ export default function TubeBoard() {
     const fromCX = fromRect.left + fromRect.width  / 2 - boardRect.left;
     const toCX   = toRect.left   + toRect.width    / 2 - boardRect.left;
 
+    // Full height of the tube element (glass body + 14px rim)
+    const H       = tubeHeight + 14;
+    const tiltRad = TILT_DEG * (Math.PI / 180);
+    const sinT    = Math.sin(tiltRad);
+    const cosT    = Math.cos(tiltRad);
+    const pourToRight = toRect.left >= fromRect.left;
+    const dir     = pourToRight ? 1 : -1;
+
+    // Move the tube so its TILTED RIM lands directly above the destination center.
+    // With transformOrigin:'center bottom', the pivot is the tube's bottom center.
+    // After rotation θ, the rim (top) is at: pivot + (H·sinθ·dir, -H·cosθ).
+    // We want rim.x = destCenterX, so: pivot.x = destCenterX - H·sinθ·dir.
+    // pivot.x = fromCX + boardRect.left + pourOffsetX → solve for pourOffsetX:
+    const pourOffsetX = toCX - fromCX - H * sinT * dir;  // board-relative
+
+    // Actual viewport position of the rim after all transforms
+    const pivotX  = fromCX + boardRect.left + pourOffsetX;
+    const pivotY  = fromRect.bottom - LIFT_PX;   // tube bottom raised by LIFT_PX
+    const emitX   = pivotX + H * sinT * dir;     // == toRect center x
+    const emitY   = pivotY - H * cosT;           // rim y after tilt
+
     setAnimInfo({
-      pourOffsetX: toCX - fromCX,
-      pourToRight: toRect.left >= fromRect.left,
-      // viewport positions for the physics canvas
-      emitX: toRect.left + toRect.width / 2,   // source tube lands here
-      emitY: fromRect.top - LIFT_PX + 14,       // tube opening after lift
-      destY: toRect.top,                         // top of dest tube glass
+      pourOffsetX,
+      pourToRight,
+      emitX,
+      emitY,
+      destY: toRect.top,
       color: pendingPour.color,
       count: pendingPour.count,
     });
-  }, [pendingPour, completePour]);
+  }, [pendingPour, completePour, tubeHeight]);
 
   const handleAnimComplete = useCallback(() => {
     setAnimInfo(null);
