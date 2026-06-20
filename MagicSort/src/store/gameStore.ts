@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { Color, Difficulty, GameStatus, PendingPour } from '../types';
-import { DIFFICULTY_CONFIGS, TUBE_CAPACITY } from '../types';
+import { DIFFICULTY_CONFIGS } from '../types';
 import { generatePuzzle } from '../utils/puzzleGenerator';
 import { isValidPour, executePour, getTopColor, getTopColorCount } from '../utils/pourLogic';
 import { checkWin, isTubeSorted } from '../utils/winChecker';
