@@ -1,49 +1,77 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { useGameStore } from '../store/gameStore';
 import Tube from './Tube';
-import PourAnimation from './PourAnimation';
+import PourAnimation, { LIFT_PX } from './PourAnimation';
 import type { Color } from '../types';
 
 interface AnimInfo {
-  fromX: number; fromY: number;
-  toX: number; toY: number;
-  color: Color;
+  pourOffsetX: number;   // how far the source tube must slide (board-relative)
   pourToRight: boolean;
-  pourOffsetX: number;
+  // viewport-relative coords for the physics canvas
+  emitX: number;
+  emitY: number;
+  destY: number;
+  color: Color;
+  count: number;
+}
+
+function calcTubeWidth(n: number): number {
+  if (n === 0) return 72;
+  const gap       = 10;
+  const available = window.innerWidth - 32;            // 16 px each side
+  const natural   = Math.floor((available - (n - 1) * gap) / n);
+  return Math.min(82, Math.max(42, natural));
 }
 
 export default function TubeBoard() {
-  const tubes = useGameStore(s => s.tubes);
+  const tubes        = useGameStore(s => s.tubes);
   const selectedTube = useGameStore(s => s.selectedTube);
-  const pendingPour = useGameStore(s => s.pendingPour);
+  const pendingPour  = useGameStore(s => s.pendingPour);
   const completePour = useGameStore(s => s.completePour);
-  const selectTube = useGameStore(s => s.selectTube);
+  const selectTube   = useGameStore(s => s.selectTube);
 
-  const boardRef = useRef<HTMLDivElement>(null);
-  const tubeRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const boardRef  = useRef<HTMLDivElement>(null);
+  const tubeRefs  = useRef<(HTMLDivElement | null)[]>([]);
   const [animInfo, setAnimInfo] = useState<AnimInfo | null>(null);
 
-  // Compute how many tubes per row based on viewport width
-  const tubesPerRow = tubes.length <= 6 ? 3 : tubes.length <= 8 ? 4 : 5;
+  const [tubeWidth, setTubeWidth] = useState(() => calcTubeWidth(0));
+  const tubeHeight = Math.round(tubeWidth * 3.2);
+
+  // Recalculate width when tube count or window size changes
+  useEffect(() => {
+    setTubeWidth(calcTubeWidth(tubes.length));
+  }, [tubes.length]);
 
   useEffect(() => {
+    const onResize = () => setTubeWidth(calcTubeWidth(tubes.length));
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [tubes.length]);
+
+  // When a pour is queued, measure DOM positions and build animInfo
+  useEffect(() => {
     if (!pendingPour || !boardRef.current) return;
-    const boardRect = boardRef.current.getBoundingClientRect();
+
     const fromEl = tubeRefs.current[pendingPour.fromIdx];
-    const toEl = tubeRefs.current[pendingPour.toIdx];
+    const toEl   = tubeRefs.current[pendingPour.toIdx];
     if (!fromEl || !toEl) { completePour(); return; }
-    const fromRect = fromEl.getBoundingClientRect();
-    const toRect = toEl.getBoundingClientRect();
-    const fromCX = fromRect.left + fromRect.width / 2 - boardRect.left;
-    const toCX   = toRect.left   + toRect.width   / 2 - boardRect.left;
+
+    const boardRect = boardRef.current.getBoundingClientRect();
+    const fromRect  = fromEl.getBoundingClientRect();
+    const toRect    = toEl.getBoundingClientRect();
+
+    const fromCX = fromRect.left + fromRect.width  / 2 - boardRect.left;
+    const toCX   = toRect.left   + toRect.width    / 2 - boardRect.left;
+
     setAnimInfo({
-      fromX: fromCX,
-      fromY: fromRect.top - boardRect.top,
-      toX:   toCX,
-      toY:   toRect.top - boardRect.top,
-      color: pendingPour.color,
-      pourToRight: toRect.left >= fromRect.left,
       pourOffsetX: toCX - fromCX,
+      pourToRight: toRect.left >= fromRect.left,
+      // viewport positions for the physics canvas
+      emitX: toRect.left + toRect.width / 2,   // source tube lands here
+      emitY: fromRect.top - LIFT_PX + 14,       // tube opening after lift
+      destY: toRect.top,                         // top of dest tube glass
+      color: pendingPour.color,
+      count: pendingPour.count,
     });
   }, [pendingPour, completePour]);
 
@@ -52,26 +80,22 @@ export default function TubeBoard() {
     completePour();
   }, [completePour]);
 
-  const calcTubeWidth = (perRow: number) => {
-    const available = Math.min(window.innerWidth, 700) - 40;
-    const natural = Math.floor(available / perRow - 16);
-    return Math.min(100, Math.max(44, natural));
-  };
-
-  const [tubeWidth, setTubeWidth] = useState(() => calcTubeWidth(tubesPerRow));
-  const tubeHeight = Math.round(tubeWidth * 3);
-
-  useEffect(() => {
-    const onResize = () => setTubeWidth(calcTubeWidth(tubesPerRow));
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, [tubesPerRow]);
-
   return (
     <div
       ref={boardRef}
-      className="relative flex flex-wrap justify-center gap-4 md:gap-5 px-4 py-6"
-      style={{ maxWidth: 720, margin: '0 auto' }}
+      style={{
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'nowrap',
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+        gap: 10,
+        padding: `${LIFT_PX + 20}px 16px 32px`,
+        width: '100%',
+        boxSizing: 'border-box',
+        overflowX: 'auto',
+      }}
     >
       {tubes.map((tube, i) => {
         const isFrom = animInfo !== null && pendingPour?.fromIdx === i;
@@ -94,10 +118,11 @@ export default function TubeBoard() {
 
       {animInfo && (
         <PourAnimation
-          fromY={animInfo.fromY}
-          toX={animInfo.toX}
-          toY={animInfo.toY}
+          emitX={animInfo.emitX}
+          emitY={animInfo.emitY}
+          destY={animInfo.destY}
           color={animInfo.color}
+          count={animInfo.count}
           onComplete={handleAnimComplete}
         />
       )}

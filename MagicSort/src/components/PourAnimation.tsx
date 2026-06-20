@@ -1,66 +1,132 @@
-import { motion } from 'framer-motion';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { COLOR_SOLID } from '../types';
 import type { Color } from '../types';
 
-const DROPS = 9;
-const STAGGER = 0.06;    // seconds between drops
-const DROP_DUR = 0.38;   // seconds per drop to fall
-const TILT_WAIT = 0.35;  // wait for tube to travel + tilt before first drop
-export const LIFT_PX = 70; // must match Tube's lift
+export const LIFT_PX = 80;
 
-interface PourAnimProps {
-  fromY: number;   // original source tube top (pre-animation)
-  toX: number;     // destination tube center x
-  toY: number;     // destination tube top
-  color: Color;
+const GRAVITY    = 2200;   // px/s²
+const TILT_DELAY = 0.32;   // seconds before first drop (tube is traveling)
+
+interface Particle {
+  x: number; y: number;
+  vx: number; vy: number;
+  r: number;
+  done: boolean;
+}
+
+interface Props {
+  emitX:  number;   // viewport x — center of dest tube (source tube moved here)
+  emitY:  number;   // viewport y — tube opening after lift
+  destY:  number;   // viewport y — top of destination tube glass body
+  color:  Color;
+  count:  number;   // color units being poured (1–4)
   onComplete: () => void;
 }
 
-export default function PourAnimation({ fromY, toX, toY, color, onComplete }: PourAnimProps) {
+export default function PourAnimation({ emitX, emitY, destY, color, count, onComplete }: Props) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
   useEffect(() => {
-    const totalMs = (TILT_WAIT + (DROPS - 1) * STAGGER + DROP_DUR) * 1000 + 100;
-    const t = setTimeout(onComplete, totalMs);
-    return () => clearTimeout(t);
+    const canvas = canvasRef.current!;
+    // Match device pixels exactly so particles are crisp
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width  = window.innerWidth  * dpr;
+    canvas.height = window.innerHeight * dpr;
+    canvas.style.width  = `${window.innerWidth}px`;
+    canvas.style.height = `${window.innerHeight}px`;
+
+    const ctx = canvas.getContext('2d')!;
+    ctx.scale(dpr, dpr);
+
+    const total     = Math.max(35, count * 28);
+    const emitDur   = 0.95;                  // seconds to emit all drops
+    const emitRate  = total / emitDur;
+
+    const particles: Particle[] = [];
+    let emitted     = 0;
+    let emitElapsed = 0;
+    let tiltElapsed = 0;
+    let rafId: number;
+    let lastTs      = performance.now();
+
+    const hex = COLOR_SOLID[color];
+
+    function loop(ts: number) {
+      const dt = Math.min((ts - lastTs) / 1000, 0.05);
+      lastTs = ts;
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+      // Wait for tube to travel and tilt before emitting
+      if (tiltElapsed < TILT_DELAY) {
+        tiltElapsed += dt;
+        rafId = requestAnimationFrame(loop);
+        return;
+      }
+
+      // Emit drops gradually
+      emitElapsed += dt;
+      const target = Math.min(total, Math.round(emitElapsed * emitRate));
+      while (emitted < target) {
+        particles.push({
+          x:  emitX + (Math.random() - 0.5) * 14,
+          y:  emitY,
+          vx: (Math.random() - 0.5) * 120,
+          vy: 30 + Math.random() * 80,
+          r:  3 + Math.random() * 3,
+          done: false,
+        });
+        emitted++;
+      }
+
+      // Physics update + draw
+      let alive = 0;
+      ctx.shadowColor = hex;
+      ctx.shadowBlur  = 10;
+
+      for (const p of particles) {
+        if (p.done) continue;
+
+        p.vy += GRAVITY * dt;
+        p.x  += p.vx * dt;
+        p.y  += p.vy * dt;
+
+        if (p.y >= destY) { p.done = true; continue; }
+
+        alive++;
+
+        // Stretch drop in direction of travel (teardrop at speed)
+        const speed   = Math.hypot(p.vx, p.vy);
+        const stretch = Math.min(3.2, 1 + speed / 480);
+        const angle   = Math.atan2(p.vy, p.vx);
+
+        ctx.save();
+        ctx.globalAlpha = 0.92;
+        ctx.fillStyle   = hex;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(angle);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, p.r / stretch, p.r * stretch, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      if (emitted >= total && alive === 0) {
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        onComplete();
+        return;
+      }
+
+      rafId = requestAnimationFrame(loop);
+    }
+
+    rafId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafId);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Tube has moved to toX and lifted by LIFT_PX — drops fall from there straight down
-  const startX = toX;
-  const startY = fromY - LIFT_PX;
-  const dy = toY - startY;
-
   return (
-    <>
-      {Array.from({ length: DROPS }, (_, i) => (
-        <motion.div
-          key={i}
-          style={{
-            position: 'absolute',
-            left: startX - 5,
-            top: startY,
-            width: 10,
-            height: 14,
-            borderRadius: '40% 40% 60% 60%',
-            background: COLOR_SOLID[color],
-            boxShadow: `0 0 8px ${COLOR_SOLID[color]}bb`,
-            pointerEvents: 'none',
-            zIndex: 50,
-          }}
-          initial={{ y: 0, opacity: 0, scaleY: 0.5 }}
-          animate={{
-            y: dy,
-            opacity: [0, 1, 1, 0],
-            scaleY: [0.5, 1.6, 1.2, 0.8],
-          }}
-          transition={{
-            delay: TILT_WAIT + i * STAGGER,
-            duration: DROP_DUR,
-            y: { ease: 'easeIn' },
-            opacity: { ease: 'linear', times: [0, 0.08, 0.75, 1] },
-            scaleY: { ease: 'easeOut', times: [0, 0.1, 0.5, 1] },
-          }}
-        />
-      ))}
-    </>
+    <canvas
+      ref={canvasRef}
+      style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 200 }}
+    />
   );
 }

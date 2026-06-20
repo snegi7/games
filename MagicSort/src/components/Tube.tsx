@@ -16,7 +16,7 @@ interface TubeProps {
   pourOffsetX?: number;
 }
 
-const LIFT_PX = 70;
+const LIFT_PX = 80;
 
 const Tube = forwardRef<HTMLDivElement, TubeProps>(
   ({ tube, index, isSelected, onClick, tubeWidth, tubeHeight, isPouringFrom, pourToRight, pourOffsetX }, ref) => {
