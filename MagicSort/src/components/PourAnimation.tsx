@@ -19,18 +19,17 @@ interface Particle {
 }
 
 interface Props {
-  pivotX:     number;   // viewport x — tube bottom-center after translate (= dest center x)
+  pivotX:     number;   // viewport x — dest tube center x (rim stays here throughout)
   pivotY:     number;   // viewport y — tube bottom-center after lift
   H:          number;   // tube outer height (tubeHeight + 14)
   destY:      number;   // viewport y — top of destination tube (absorption line)
-  pourToRight: boolean;
   color:      Color;
   count:      number;   // color units being poured (1–4)
   onComplete: () => void;
 }
 
 export default function PourAnimation({
-  pivotX, pivotY, H, destY, pourToRight, color, count, onComplete,
+  pivotX, pivotY, H, destY, color, count, onComplete,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 

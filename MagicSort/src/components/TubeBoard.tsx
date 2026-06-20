@@ -134,7 +134,6 @@ export default function TubeBoard() {
           pivotY={animInfo.pivotY}
           H={animInfo.H}
           destY={animInfo.destY}
-          pourToRight={animInfo.pourToRight}
           color={animInfo.color}
           count={animInfo.count}
           onComplete={handleAnimComplete}
