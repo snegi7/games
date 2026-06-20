@@ -1,0 +1,16 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+var __filename = fileURLToPath(import.meta.url);
+var __dirname = dirname(__filename);
+export default defineConfig({
+    base: '/CozyKitchen/',
+    plugins: [react()],
+    resolve: {
+        alias: {
+            '@': resolve(__dirname, './src'),
+            '@games/shared': resolve(__dirname, '../packages/shared/src'),
+        },
+    },
+});
