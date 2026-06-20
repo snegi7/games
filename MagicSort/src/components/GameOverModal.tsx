@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useGameStore } from '../store/gameStore';
 import { isTubeSorted } from '../utils/winChecker';
-import { TUBE_CAPACITY } from '../types';
+import { TUBE_CAPACITY, DIFFICULTY_CONFIGS } from '../types';
 
 export default function GameOverModal() {
   const gameStatus = useGameStore(s => s.gameStatus);
@@ -13,7 +13,7 @@ export default function GameOverModal() {
   if (gameStatus !== 'lost' || !difficulty) return null;
 
   const sortedCount = tubes.filter(t => isTubeSorted(t, TUBE_CAPACITY)).length;
-  const colorTubes = tubes.filter(t => t.length > 0).length;
+  const totalColorTubes = DIFFICULTY_CONFIGS[difficulty].colors;
 
   return (
     <motion.div
@@ -47,7 +47,7 @@ export default function GameOverModal() {
         >
           <span style={{ color: '#9ca3af' }}>Tubes sorted</span>
           <span className="font-bold" style={{ color: '#e2e8f0' }}>
-            {sortedCount} / {colorTubes}
+            {sortedCount} / {totalColorTubes}
           </span>
         </div>
 

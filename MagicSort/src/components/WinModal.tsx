@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useGameStore } from '../store/gameStore';
 import { DIFFICULTY_CONFIGS } from '../types';
@@ -12,6 +13,13 @@ export default function WinModal() {
   const goHome = useGameStore(s => s.goHome);
 
   if (gameStatus !== 'won' || !difficulty) return null;
+
+  const confettiOffsets = useRef(
+    CONFETTI_COLORS.map(() => ({
+      x: (Math.random() - 0.5) * 300,
+      y: (Math.random() - 0.5) * 300,
+    }))
+  );
 
   const moveLimit = DIFFICULTY_CONFIGS[difficulty].moveLimit;
 
@@ -33,7 +41,7 @@ export default function WinModal() {
             left: '50%', top: '40%',
           } as React.CSSProperties}
           initial={{ scale: 0, opacity: 1 }}
-          animate={{ scale: [0, 1.5, 0], x: [(Math.random() - 0.5) * 300], y: [(Math.random() - 0.5) * 300], opacity: [1, 1, 0] }}
+          animate={{ scale: [0, 1.5, 0], x: [confettiOffsets.current[i].x], y: [confettiOffsets.current[i].y], opacity: [1, 1, 0] }}
           transition={{ duration: 0.9, delay: i * 0.06, ease: 'easeOut' }}
         />
       ))}
