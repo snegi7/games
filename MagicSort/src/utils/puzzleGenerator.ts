@@ -1,48 +1,42 @@
 import type { Color, Difficulty } from '../types';
 import { ALL_COLORS, DIFFICULTY_CONFIGS, TUBE_CAPACITY } from '../types';
-import { getTopColor } from './pourLogic';
 import { checkWin } from './winChecker';
 
 export function generatePuzzle(difficulty: Difficulty): Color[][] {
   const config = DIFFICULTY_CONFIGS[difficulty];
   const colors = ALL_COLORS.slice(0, config.colors);
 
-  for (let attempt = 0; attempt < 10; attempt++) {
-    // Build solved state
-    let tubes: Color[][] = [
-      ...colors.map(c => Array<Color>(TUBE_CAPACITY).fill(c)),
-      ...Array.from({ length: config.emptyTubes }, () => [] as Color[]),
-    ];
+  for (let attempt = 0; attempt < 50; attempt++) {
+    // Pool of all color units, then Fisher-Yates shuffle for thorough mixing
+    const pool: Color[] = [];
+    for (const c of colors) {
+      for (let i = 0; i < TUBE_CAPACITY; i++) pool.push(c);
+    }
+    fisherYates(pool);
 
-    // Scramble with random valid single-segment pours
-    // Single-segment moves (not batch) give finer-grained shuffling
-    const iterations = config.colors * TUBE_CAPACITY * 20;
-    for (let i = 0; i < iterations; i++) {
-      const candidates: [number, number][] = [];
-      for (let f = 0; f < tubes.length; f++) {
-        for (let t = 0; t < tubes.length; t++) {
-          if (f !== t && localIsValidPour(tubes[f], tubes[t], TUBE_CAPACITY)) {
-            candidates.push([f, t]);
-          }
-        }
-      }
-      if (candidates.length === 0) break;
-      const [f, t] = candidates[Math.floor(Math.random() * candidates.length)];
-      const next = tubes.map(tube => [...tube]);
-      next[t].push(next[f].pop()!);
-      tubes = next;
+    // Fill colored tubes from shuffled pool, add empty tubes
+    const tubes: Color[][] = [];
+    for (let i = 0; i < colors.length; i++) {
+      tubes.push(pool.slice(i * TUBE_CAPACITY, (i + 1) * TUBE_CAPACITY));
+    }
+    for (let i = 0; i < config.emptyTubes; i++) {
+      tubes.push([]);
     }
 
-    if (!checkWin(tubes, TUBE_CAPACITY)) return tubes;
+    // Reject if accidentally solved or any tube is already fully sorted
+    if (!checkWin(tubes, TUBE_CAPACITY) && !hasPresortedTube(tubes)) return tubes;
   }
 
-  throw new Error(`generatePuzzle: failed to produce unsolved state after 10 attempts (difficulty: ${difficulty})`);
+  throw new Error(`generatePuzzle: failed after 50 attempts (difficulty: ${difficulty})`);
 }
 
-function localIsValidPour(from: Color[], to: Color[], capacity: number): boolean {
-  if (from.length === 0 || to.length >= capacity) return false;
-  const fromTop = getTopColor(from);
-  const toTop = getTopColor(to);
-  if (toTop !== null && toTop !== fromTop) return false;
-  return true;
+function fisherYates<T>(arr: T[]): void {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function hasPresortedTube(tubes: Color[][]): boolean {
+  return tubes.some(tube => tube.length === TUBE_CAPACITY && tube.every(c => c === tube[0]));
 }
