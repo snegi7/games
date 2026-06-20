@@ -42,6 +42,9 @@ export default function HomeScreen() {
         <p className="text-sm tracking-widest uppercase" style={{ color: '#4b5563' }}>
           Color Puzzle
         </p>
+        <p className="text-xs mt-2" style={{ color: '#374151' }}>
+          A game by Yahvi Joy
+        </p>
       </motion.div>
 
       {/* Difficulty buttons */}
