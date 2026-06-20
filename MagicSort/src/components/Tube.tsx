@@ -15,10 +15,12 @@ interface TubeProps {
   isPouringFrom?: boolean;
   pourToRight?: boolean;
   pourOffsetX?: number;
+  incomingColor?: Color;
+  incomingCount?: number;
 }
 
 const Tube = forwardRef<HTMLDivElement, TubeProps>(
-  ({ tube, index, isSelected, onClick, tubeWidth, tubeHeight, isPouringFrom, pourToRight, pourOffsetX }, ref) => {
+  ({ tube, index, isSelected, onClick, tubeWidth, tubeHeight, isPouringFrom, pourToRight, pourOffsetX, incomingColor, incomingCount }, ref) => {
     const sorted = isTubeSorted(tube, TUBE_CAPACITY);
     const empty = tube.length === 0;
 
@@ -166,6 +168,22 @@ const Tube = forwardRef<HTMLDivElement, TubeProps>(
               />
             </motion.div>
           ))}
+
+          {/* Incoming liquid — rises from top of existing content during pour */}
+          {incomingColor !== undefined && incomingCount !== undefined && (
+            <motion.div
+              style={{
+                position: 'absolute',
+                bottom: `${(tube.length / TUBE_CAPACITY) * 100}%`,
+                left: 0, right: 0,
+                background: COLOR_GRADIENTS[incomingColor],
+                zIndex: 1,
+              }}
+              initial={{ height: 0 }}
+              animate={{ height: `${(incomingCount / TUBE_CAPACITY) * 100}%` }}
+              transition={{ duration: EMIT_DUR, ease: 'easeIn', delay: TILT_DELAY }}
+            />
+          )}
 
           {/* Empty state subtle glow */}
           {empty && (

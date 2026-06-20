@@ -111,6 +111,7 @@ export default function TubeBoard() {
     >
       {tubes.map((tube, i) => {
         const isFrom = animInfo !== null && pendingPour?.fromIdx === i;
+        const isTo   = animInfo !== null && pendingPour?.toIdx   === i;
         return (
           <Tube
             key={i}
@@ -124,6 +125,8 @@ export default function TubeBoard() {
             isPouringFrom={isFrom}
             pourToRight={animInfo?.pourToRight ?? false}
             pourOffsetX={isFrom ? (animInfo?.pourOffsetX ?? 0) : 0}
+            incomingColor={isTo ? animInfo?.color : undefined}
+            incomingCount={isTo ? animInfo?.count : undefined}
           />
         );
       })}
