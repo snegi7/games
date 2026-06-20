@@ -14,7 +14,7 @@ export const mathQuestionsAge6: Question[] = [
   { id: 'm6-007', category: 'math', ageLevel: 6, question: '1 + 9 = ?', options: ['10', '9', '11', '8'], correctAnswerIndex: 0, difficulty: 'easy' },
   { id: 'm6-008', category: 'math', ageLevel: 6, question: '0 + 10 = ?', options: ['0', '10', '11', '1'], correctAnswerIndex: 1, difficulty: 'easy' },
   { id: 'm6-009', category: 'math', ageLevel: 6, question: '5 + 5 = ?', options: ['10', '9', '11', '8'], correctAnswerIndex: 0, difficulty: 'easy' },
-  { id: 'm6-010', category: 'math', ageLevel: 6, question: '2 + 8 = ?', options: ['9', '10', '11', '8'], correctAnswerIndex: 1, difficulty: 'easy' },
+  { id: 'm6-10', category: 'math', ageLevel: 6, question: '2 + 8 = ?', options: ['9', '10', '11', '8'], correctAnswerIndex: 1, difficulty: 'easy' },
 
   // --- Subtraction (0-10) ---
   { id: 'm6-011', category: 'math', ageLevel: 6, question: '5 - 1 = ?', options: ['3', '4', '5', '2'], correctAnswerIndex: 1, difficulty: 'easy' },
@@ -176,7 +176,7 @@ export const mathQuestionsAge6: Question[] = [
   { id: 'm6-145', category: 'math', ageLevel: 6, question: 'Complete: 5, 10, 5, 10, __', options: ['5', '10', '15', '0'], correctAnswerIndex: 0, difficulty: 'medium' },
   { id: 'm6-146', category: 'math', ageLevel: 6, question: 'Pattern: Sun, Moon, Star, Sun, Moon, __', options: ['Sun', 'Moon', 'Star', 'Cloud'], correctAnswerIndex: 2, difficulty: 'medium' },
   { id: 'm6-147', category: 'math', ageLevel: 6, question: 'What is next? Big, Big, Small, Big, Big, __', options: ['Big', 'Small', 'Tiny', 'Large'], correctAnswerIndex: 1, difficulty: 'medium' },
-  { id: 'm6-148', category: 'math', ageLevel: 6, question: 'What comes next? 1, 1, 2, 2, 3, 3, __', options: ['3', '4', '5', '1'], correctAnswerIndex: 1, difficulty: 'hard' },
+  { id: 'm6-148', category: 'math', ageLevel: 6, question: 'Pattern: 1, 1, 2, 2, 3, 3, __', options: ['3', '4', '5', '1'], correctAnswerIndex: 1, difficulty: 'hard' },
   { id: 'm6-149', category: 'math', ageLevel: 6, question: 'What comes next? A, B, C, A, B, __', options: ['A', 'B', 'C', 'D'], correctAnswerIndex: 2, difficulty: 'medium' },
   { id: 'm6-150', category: 'math', ageLevel: 6, question: 'Complete: 🔵, 🔴, 🔵, 🔴, __', options: ['🔵', '🔴', '🟡', '🟢'], correctAnswerIndex: 0, difficulty: 'easy' },
 
