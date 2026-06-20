@@ -22,7 +22,7 @@ export default function TubeBoard() {
   const [animInfo, setAnimInfo] = useState<AnimInfo | null>(null);
 
   // Compute how many tubes per row based on viewport width
-  const tubesPerRow = tubes.length <= 6 ? 3 : tubes.length <= 8 ? 4 : 4;
+  const tubesPerRow = tubes.length <= 6 ? 3 : tubes.length <= 8 ? 4 : 5;
 
   useEffect(() => {
     if (!pendingPour || !boardRef.current) return;
@@ -46,9 +46,17 @@ export default function TubeBoard() {
     completePour();
   }, [completePour]);
 
-  // Responsive tube sizing
-  const tubeWidth = Math.min(52, Math.floor((Math.min(window.innerWidth, 480) - 40) / tubesPerRow - 12));
+  const calcTubeWidth = (perRow: number) =>
+    Math.min(52, Math.floor((Math.min(window.innerWidth, 480) - 40) / perRow - 12));
+
+  const [tubeWidth, setTubeWidth] = useState(() => calcTubeWidth(tubesPerRow));
   const tubeHeight = Math.round(tubeWidth * 2.4);
+
+  useEffect(() => {
+    const onResize = () => setTubeWidth(calcTubeWidth(tubesPerRow));
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [tubesPerRow]);
 
   return (
     <div
@@ -75,7 +83,6 @@ export default function TubeBoard() {
       {animInfo && (
         <PourAnimation
           {...animInfo}
-          active={true}
           onComplete={handleAnimComplete}
         />
       )}
