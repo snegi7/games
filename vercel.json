@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "npm install",
-  "buildCommand": "mkdir -p dist && cp index.html styles.css dist/ && cp -r assets dist/ && cd AnimalRescue && npm run build && cp -r dist ../dist/AnimalRescue && cd ../CozyKitchen && npm run build && cp -r dist ../dist/CozyKitchen && cd ../MagicSort && npm run build && cp -r dist ../dist/MagicSort",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
     { "source": "/CozyKitchen/(.*)", "destination": "/CozyKitchen/index.html" },

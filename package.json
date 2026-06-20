@@ -17,6 +17,7 @@
     "build:kitchen": "npm run build --workspace=cozy-kitchen",
     "build:magic": "npm run build --workspace=magic-sort",
     "build:all": "npm run build --workspaces",
+    "build": "mkdir -p dist && cp index.html styles.css dist/ && cp -r assets dist/ && cd AnimalRescue && npm run build && cp -r dist ../dist/AnimalRescue && cd ../CozyKitchen && npm run build && cp -r dist ../dist/CozyKitchen && cd ../MagicSort && npm run build && cp -r dist ../dist/MagicSort",
     "lint": "npm run lint --workspaces --if-present"
   },
   "devDependencies": {
