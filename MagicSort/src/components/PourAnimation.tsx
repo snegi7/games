@@ -2,10 +2,9 @@ import { useEffect, useRef } from 'react';
 import { COLOR_SOLID } from '../types';
 import type { Color } from '../types';
 
-export const LIFT_PX    = 140;   // how high the tube lifts (px)
-export const TILT_DEG   = 42;    // max tilt angle (degrees)
-export const TILT_DELAY = 0.30;  // seconds to wait while tube travels before tilting/emitting
-export const EMIT_DUR   = 0.90;  // seconds over which all drops are emitted
+import { LIFT_PX, TILT_DEG, TILT_DELAY, EMIT_DUR } from '../utils/pourConstants';
+// Keep them as re-exports so Tube.tsx's existing import doesn't break yet:
+export { LIFT_PX, TILT_DEG, TILT_DELAY, EMIT_DUR };
 
 const GRAVITY   = 2200;
 const MAX_TILT  = TILT_DEG * (Math.PI / 180);
