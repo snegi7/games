@@ -1,9 +1,9 @@
 import { TUBE_CAPACITY } from '../types';
 
-export const PARTICLES_PER_SLOT = 12;
+export const PARTICLES_PER_SLOT = 18;
 export const PARTICLE_RADIUS    = 3;
-export const BLOB_RADIUS        = 14;
-export const THRESHOLD          = 110;
+export const BLOB_RADIUS        = 20;
+export const THRESHOLD          = 80;
 
 export function slotCenterY(
   rect: Pick<DOMRect, 'top' | 'bottom'>,

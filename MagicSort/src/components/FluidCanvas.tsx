@@ -97,7 +97,7 @@ interface StreamParticle {
   done: boolean;
 }
 
-const GRAVITY = 2200;
+const GRAVITY = 800;
 
 export interface FluidCanvasHandle {
   jiggle: (tubeIdx: number) => void;
@@ -276,10 +276,10 @@ const FluidCanvas = forwardRef<FluidCanvasHandle, Props>(
           const target = Math.min(Math.max(40, ps.count * 30), Math.round(emitElapsed * ps.emitRate));
           while (emitted < target) {
             streamParticles.push({
-              x:  rim.x + (Math.random() - 0.5) * 10,
+              x:  rim.x + (Math.random() - 0.5) * 6,
               y:  rim.y,
-              vx: (Math.random() - 0.5) * 80,
-              vy: 20 + Math.random() * 60,
+              vx: (Math.random() - 0.5) * 15,
+              vy: 80 + Math.random() * 40,
               r:  3 + Math.random() * 3,
               done: false,
             });
@@ -360,12 +360,12 @@ function renderStreamMetaballs(
   oc.clearRect(0, 0, W, H);
 
   for (const p of positions) {
-    const g = oc.createRadialGradient(p.x, p.y, 0, p.x, p.y, BLOB_RADIUS * 1.2);
+    const g = oc.createRadialGradient(p.x, p.y, 0, p.x, p.y, BLOB_RADIUS * 2.0);
     g.addColorStop(0, 'rgba(255,255,255,1)');
     g.addColorStop(1, 'rgba(255,255,255,0)');
     oc.fillStyle = g;
     oc.beginPath();
-    oc.arc(p.x, p.y, BLOB_RADIUS * 1.2, 0, Math.PI * 2);
+    oc.arc(p.x, p.y, BLOB_RADIUS * 2.0, 0, Math.PI * 2);
     oc.fill();
   }
 
