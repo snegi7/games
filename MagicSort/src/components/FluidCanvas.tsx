@@ -106,11 +106,11 @@ interface Props {
 }
 
 export default function FluidCanvas({ tubeRefs, tubeCount, tubeHeight }: Props) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const offCanvas = useRef<HTMLCanvasElement | null>(null);
+  const canvasRef   = useRef<HTMLCanvasElement>(null);
+  const offCanvas   = useRef<HTMLCanvasElement | null>(null);
+  const streamCanvas = useRef<HTMLCanvasElement | null>(null);
 
   const tubes        = useGameStore(s => s.tubes);
-  const pendingPour  = useGameStore(s => s.pendingPour);
   const completePour = useGameStore(s => s.completePour);
 
   const { physicsRef, reconcile, stepAll, drainParticles } = useMatterWorld(tubeCount);
@@ -126,6 +126,9 @@ export default function FluidCanvas({ tubeRefs, tubeCount, tubeHeight }: Props) 
     offCanvas.current = document.createElement('canvas');
     offCanvas.current.width  = 120;
     offCanvas.current.height = 240;
+    streamCanvas.current = document.createElement('canvas');
+    streamCanvas.current.width  = window.innerWidth;
+    streamCanvas.current.height = window.innerHeight;
   }, []);
 
   // reconcile when tubes state changes
@@ -143,7 +146,7 @@ export default function FluidCanvas({ tubeRefs, tubeCount, tubeHeight }: Props) 
     const canvas = canvasRef.current!;
     const dpr    = window.devicePixelRatio || 1;
     const ctx    = canvas.getContext('2d')!;
-    ctx.scale(dpr, dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     let pourActive    = false;
     let totalElapsed  = 0;
@@ -177,11 +180,14 @@ export default function FluidCanvas({ tubeRefs, tubeCount, tubeHeight }: Props) 
       return { x: pivotX, y: pivotY - H * Math.cos(tiltRad) };
     }
 
-    let latestPendingPour = pendingPour;
+    let latestPendingPour = useGameStore.getState().pendingPour;
 
     function syncPourSnapshot() {
       if (!latestPendingPour) { pourSnapshot = null; return; }
-      if (pourSnapshot && pourSnapshot.fromIdx === latestPendingPour.fromIdx) return;
+      if (pourSnapshot &&
+          pourSnapshot.fromIdx === latestPendingPour.fromIdx &&
+          pourSnapshot.toIdx   === latestPendingPour.toIdx   &&
+          pourSnapshot.color   === latestPendingPour.color) return;
 
       const refs   = tubeRefs.current ?? [];
       const fromEl = refs[latestPendingPour.fromIdx];
@@ -288,7 +294,7 @@ export default function FluidCanvas({ tubeRefs, tubeCount, tubeHeight }: Props) 
         }
 
         if (livePositions.length > 0) {
-          renderStreamMetaballs(ctx, ps.color, livePositions);
+          renderStreamMetaballs(ctx, streamCanvas.current!, ps.color, livePositions);
         }
 
         if (totalElapsed >= TOTAL_DUR && alive === 0 && !pourComplete) {
@@ -329,16 +335,19 @@ export default function FluidCanvas({ tubeRefs, tubeCount, tubeHeight }: Props) 
 
 function renderStreamMetaballs(
   ctx:       CanvasRenderingContext2D,
+  offScreen: HTMLCanvasElement,
   color:     Color,
   positions: { x: number; y: number }[],
 ) {
   const W = ctx.canvas.width  / (window.devicePixelRatio || 1);
   const H = ctx.canvas.height / (window.devicePixelRatio || 1);
 
-  const off = document.createElement('canvas');
-  off.width  = W;
-  off.height = H;
-  const oc = off.getContext('2d')!;
+  if (offScreen.width < W || offScreen.height < H) {
+    offScreen.width  = Math.max(offScreen.width,  W);
+    offScreen.height = Math.max(offScreen.height, H);
+  }
+  const oc = offScreen.getContext('2d')!;
+  oc.clearRect(0, 0, W, H);
 
   for (const p of positions) {
     const g = oc.createRadialGradient(p.x, p.y, 0, p.x, p.y, BLOB_RADIUS * 1.2);
@@ -361,5 +370,5 @@ function renderStreamMetaballs(
     }
   }
   oc.putImageData(imgData, 0, 0);
-  ctx.drawImage(off, 0, 0);
+  ctx.drawImage(offScreen, 0, 0);
 }
