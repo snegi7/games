@@ -1,0 +1,160 @@
+<h2>Fluid Physics Approach</h2>
+<p class="subtitle">Three ways to make the liquid pour look and behave realistically in MagicSort</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f0f1a;height:200px;border-radius:8px;overflow:hidden;position:relative;">
+      <canvas id="ca" width="220" height="200" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+    </div>
+    <div class="card-body">
+      <h3>A — Matter.js + Metaballs</h3>
+      <p>Matter.js handles rigid-body + particle physics; canvas renders them with a metaball (gaussian blur + threshold) pass so individual drops merge into a smooth liquid blob. Tube tilt uses the same engine — liquid actually sloshes inside as it rotates.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Looks genuinely liquid — blobs merge, split, coalesce</li>
+          <li>Real gravity, collisions, tube walls</li>
+          <li>Matter.js is well-maintained, 47 kB gzipped</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>Need to model tube as Matter.js body</li>
+          <li>Canvas overlay for metaball render pass</li>
+          <li>Medium integration effort (~3–4 days)</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f0f1a;height:200px;border-radius:8px;overflow:hidden;position:relative;">
+      <canvas id="cb" width="220" height="200" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+    </div>
+    <div class="card-body">
+      <h3>B — Custom SPH Fluid</h3>
+      <p>Smoothed Particle Hydrodynamics: each color unit becomes a set of fluid particles with pressure and viscosity forces. Rendered as metaballs. No third-party engine — pure canvas math. Most realistic fluid behavior.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>True fluid dynamics — cohesion, surface tension, flow</li>
+          <li>No dependency to manage</li>
+          <li>Full control over feel</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>CPU-intensive for many particles (needs spatial hash)</li>
+          <li>Hardest to implement correctly (~5–7 days)</li>
+          <li>Tuning can be tricky</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f0f1a;height:200px;border-radius:8px;overflow:hidden;position:relative;">
+      <canvas id="cc" width="220" height="200" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+    </div>
+    <div class="card-body">
+      <h3>C — Planck.js (Box2D) + Metaballs</h3>
+      <p>Planck.js is a faithful JavaScript port of Box2D. More physically accurate than Matter.js for complex collisions and constraints. Same metaball rendering strategy. Good choice if you want the tube joints and constraints to feel very precise.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Most accurate rigid body physics</li>
+          <li>Active maintenance, TypeScript types</li>
+          <li>Great for constrained tube opening geometry</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>More verbose API than Matter.js</li>
+          <li>Larger learning curve</li>
+          <li>Box2D wasn't designed for fluid (same workaround as A)</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Animate each canvas with a simplified metaball preview
+
+function drawMetaballs(canvas, color, seed) {
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const particles = [];
+  const N = 18;
+  const rng = (s) => { let x = Math.sin(s * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+
+  for (let i = 0; i < N; i++) {
+    particles.push({
+      x: W * 0.3 + rng(seed + i) * W * 0.4,
+      y: H * 0.2 + rng(seed + i * 3) * H * 0.6,
+      vx: (rng(seed + i * 7) - 0.5) * 60,
+      vy: (rng(seed + i * 11) - 0.5) * 40 + 30,
+      r: 10 + rng(seed + i * 5) * 8,
+    });
+  }
+
+  let last = performance.now();
+  function loop(ts) {
+    const dt = Math.min((ts - last) / 1000, 0.033);
+    last = ts;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw tube outline
+    ctx.save();
+    ctx.strokeStyle = 'rgba(200,200,255,0.3)';
+    ctx.lineWidth = 2;
+    const tx = W * 0.25, ty = 20, tw = W * 0.5, th = H - 30;
+    ctx.beginPath();
+    ctx.moveTo(tx, ty);
+    ctx.lineTo(tx, ty + th - 15);
+    ctx.quadraticCurveTo(tx, ty + th, tx + tw/2, ty + th);
+    ctx.quadraticCurveTo(tx + tw, ty + th, tx + tw, ty + th - 15);
+    ctx.lineTo(tx + tw, ty);
+    ctx.stroke();
+    ctx.restore();
+
+    // Metaball offscreen render
+    const off = document.createElement('canvas');
+    off.width = W; off.height = H;
+    const oc = off.getContext('2d');
+
+    for (const p of particles) {
+      p.vy += 200 * dt;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      if (p.y + p.r > H - 5) { p.y = H - 5 - p.r; p.vy *= -0.4; }
+      if (p.x - p.r < tx + 3) { p.x = tx + 3 + p.r; p.vx *= -0.6; }
+      if (p.x + p.r > tx + tw - 3) { p.x = tx + tw - 3 - p.r; p.vx *= -0.6; }
+      if (p.y < ty + 5) { p.y = ty + 5 + p.r; p.vy *= -0.4; }
+
+      const g = oc.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 1.5);
+      g.addColorStop(0, 'rgba(255,255,255,1)');
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      oc.fillStyle = g;
+      oc.beginPath();
+      oc.arc(p.x, p.y, p.r * 1.5, 0, Math.PI * 2);
+      oc.fill();
+    }
+
+    // Threshold pass
+    const imgData = oc.getImageData(0, 0, W, H);
+    const d = imgData.data;
+    const [r, g, b] = color;
+    for (let i = 0; i < d.length; i += 4) {
+      const v = d[i];
+      if (v > 120) {
+        d[i] = r; d[i+1] = g; d[i+2] = b; d[i+3] = 220;
+      } else {
+        d[i+3] = 0;
+      }
+    }
+    ctx.putImageData(imgData, 0, 0);
+
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+}
+
+drawMetaballs(document.getElementById('ca'), [80, 150, 255], 42);
+drawMetaballs(document.getElementById('cb'), [255, 90, 90], 7);
+drawMetaballs(document.getElementById('cc'), [90, 220, 130], 99);
+</script>

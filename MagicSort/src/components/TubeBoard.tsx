@@ -1,20 +1,12 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { useGameStore } from '../store/gameStore';
 import Tube from './Tube';
-import PourAnimation, { LIFT_PX } from './PourAnimation';
 import FluidCanvas, { type FluidCanvasHandle } from './FluidCanvas';
-import type { Color } from '../types';
+import { LIFT_PX } from '../utils/pourConstants';
 
 interface AnimInfo {
   pourOffsetX: number;   // how far the source tube must slide (board-relative)
   pourToRight: boolean;
-  // viewport-relative coords for the physics canvas
-  pivotX: number;
-  pivotY: number;
-  H: number;
-  destY: number;
-  color: Color;
-  count: number;
 }
 
 function calcTubeWidth(n: number): number {
@@ -56,7 +48,8 @@ export default function TubeBoard() {
     return () => window.removeEventListener('resize', onResize);
   }, [tubes.length]);
 
-  // When a pour is queued, measure DOM positions and build animInfo
+  // When a pour is queued, measure DOM positions and drive the Tube tilt animation.
+  // FluidCanvas handles all fluid rendering; we just call completePour when done.
   useEffect(() => {
     if (!pendingPour || !boardRef.current) return;
 
@@ -71,33 +64,11 @@ export default function TubeBoard() {
     const fromCX = fromRect.left + fromRect.width  / 2 - boardRect.left;
     const toCX   = toRect.left   + toRect.width    / 2 - boardRect.left;
 
-    // Full height of the tube element (glass body + 14px rim)
-    const H       = tubeHeight + 14;
     const pourToRight = toRect.left >= fromRect.left;
+    const pourOffsetX = toCX - fromCX;  // center-to-center; rim offset handled by Tube
 
-    // Move the tube so its pivot (bottom center) lands directly above the destination center.
-    const pourOffsetX = toCX - fromCX;  // center-to-center; rimAt() handles actual rim offset
-
-    // Viewport position of the pivot after all transforms
-    const pivotX  = fromCX + boardRect.left + pourOffsetX;
-    const pivotY  = fromRect.bottom - LIFT_PX;
-
-    setAnimInfo({
-      pourOffsetX,
-      pourToRight,
-      pivotX,
-      pivotY,
-      H,
-      destY: toRect.top,
-      color: pendingPour.color,
-      count: pendingPour.count,
-    });
-  }, [pendingPour, completePour, tubeHeight]);
-
-  const handleAnimComplete = useCallback(() => {
-    setAnimInfo(null);
-    completePour();
-  }, [completePour]);
+    setAnimInfo({ pourOffsetX, pourToRight });
+  }, [pendingPour, completePour]);
 
   return (
     <div
@@ -141,18 +112,6 @@ export default function TubeBoard() {
           />
         );
       })}
-
-      {animInfo && (
-        <PourAnimation
-          pivotX={animInfo.pivotX}
-          pivotY={animInfo.pivotY}
-          H={animInfo.H}
-          destY={animInfo.destY}
-          color={animInfo.color}
-          count={animInfo.count}
-          onComplete={handleAnimComplete}
-        />
-      )}
     </div>
   );
 }

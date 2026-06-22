@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/satyarthn/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/**)",
+      "Bash(bash scripts/start-server.sh --project-dir /Users/satyarthn/Workspace/games)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(npm install *)",
+      "Bash(git *)",
+      "Bash(npm test *)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(npm --version)",
+      "Bash(npm cache *)",
+      "Bash(npm config *)",
+      "Bash(wait)",
+      "Bash(curl -s http://localhost:5175/MagicSort/)",
+      "Bash(curl -s http://localhost:5175/)",
+      "Bash(pkill -f \"vite --port 5175\")",
+      "Bash(/Users/satyarthn/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/scripts/start-server.sh *)",
+      "Bash(/Users/satyarthn/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/scripts/start-server.sh *)",
+      "Bash(npm remove *)",
+      "Bash(xargs cat *)",
+      "Bash(node *)"
+    ]
+  }
+}

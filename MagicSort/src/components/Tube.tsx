@@ -3,7 +3,7 @@ import { forwardRef } from 'react';
 import type { Color } from '../types';
 import { TUBE_CAPACITY } from '../types';
 import { isTubeSorted } from '../utils/winChecker';
-import { LIFT_PX, TILT_DEG, EMIT_DUR, TILT_DELAY } from './PourAnimation';
+import { LIFT_PX, TILT_DEG, EMIT_DUR, TILT_DELAY } from '../utils/pourConstants';
 
 interface TubeProps {
   tube: Color[];
@@ -15,13 +15,10 @@ interface TubeProps {
   isPouringFrom?: boolean;
   pourToRight?: boolean;
   pourOffsetX?: number;
-  incomingColor?: Color;
-  incomingCount?: number;
-  leavingCount?: number;
 }
 
 const Tube = forwardRef<HTMLDivElement, TubeProps>(
-  ({ tube, index, isSelected, onClick, tubeWidth, tubeHeight, isPouringFrom, pourToRight, pourOffsetX, incomingColor: _incomingColor, incomingCount: _incomingCount, leavingCount: _leavingCount }, ref) => {
+  ({ tube, index, isSelected, onClick, tubeWidth, tubeHeight, isPouringFrom, pourToRight, pourOffsetX }, ref) => {
     const sorted = isTubeSorted(tube, TUBE_CAPACITY);
 
     // Two-phase pour animation:

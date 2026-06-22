@@ -1,0 +1,211 @@
+<h2>Tube Rendering Strategy</h2>
+<p class="subtitle">How should the fluid inside the tubes be drawn? Two fundamentally different architectures.</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f0f1a;height:240px;border-radius:8px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;gap:18px;">
+      <!-- CSS shell tube with canvas interior -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div style="font-size:10px;color:#aaa;margin-bottom:4px;">CSS Glass Shell</div>
+        <div style="width:44px;height:160px;position:relative;">
+          <!-- Rim -->
+          <div style="width:50px;height:12px;background:linear-gradient(180deg,rgba(220,220,255,0.65),rgba(140,140,190,0.35));border:1.5px solid rgba(255,255,255,0.38);border-bottom:none;border-radius:5px 5px 0 0;margin-left:-3px;"></div>
+          <!-- Glass body with canvas inside -->
+          <div style="width:44px;height:148px;border-radius:0 0 50% 50% / 0 0 20px 20px;overflow:hidden;border:1.5px solid rgba(255,255,255,0.18);border-top:none;position:relative;background:rgba(255,255,255,0.04);">
+            <canvas id="inlineA" width="44" height="148" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+            <!-- Glass reflection stays on top -->
+            <div style="position:absolute;top:6px;left:6px;width:4px;height:60%;background:linear-gradient(180deg,rgba(255,255,255,0.45),transparent);border-radius:3px;z-index:10;pointer-events:none;"></div>
+          </div>
+        </div>
+        <div style="font-size:9px;color:#666;text-align:center;width:60px;">Glass shell = CSS<br>Fluid = Canvas</div>
+      </div>
+      <div style="color:#555;font-size:20px;">+</div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div style="font-size:10px;color:#aaa;margin-bottom:4px;">Matter.js World</div>
+        <div style="width:44px;height:160px;background:rgba(80,80,120,0.15);border:1px dashed rgba(100,100,200,0.3);border-radius:4px;display:flex;align-items:center;justify-content:center;">
+          <canvas id="worldA" width="44" height="160" style="width:100%;height:100%;"></canvas>
+        </div>
+        <div style="font-size:9px;color:#666;text-align:center;width:60px;">Physics bodies<br>invisible</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Hybrid: CSS Shell + Canvas Interior</h3>
+      <p>Keep the existing HTML/CSS tube structure (rim, glass border, reflections, click handling). Replace only the colored segment interior with a canvas that renders Matter.js fluid particles. A single global canvas overlay paints all tube interiors.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Less rework — keeps glass effects, selection glow, layout</li>
+          <li>Click handling stays in React</li>
+          <li>Easier to roll back if needed</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>Must sync tube pixel positions → Matter.js world coords each frame</li>
+          <li>Canvas clipping to tube shape needed</li>
+          <li>Two rendering systems to coordinate</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f0f1a;height:240px;border-radius:8px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;gap:24px;">
+      <!-- Full canvas tube -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div style="font-size:10px;color:#aaa;margin-bottom:4px;">Full Canvas</div>
+        <canvas id="fullB" width="44" height="172" style="width:44px;height:172px;border-radius:4px;"></canvas>
+        <div style="font-size:9px;color:#666;text-align:center;width:60px;">Everything drawn<br>on canvas</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div style="font-size:10px;color:#aaa;margin-bottom:4px;">HTML layer</div>
+        <div style="width:44px;height:172px;background:rgba(30,30,60,0.3);border:1px dashed rgba(100,100,200,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;">
+          <div style="color:rgba(100,100,200,0.5);font-size:10px;text-align:center;">invisible<br>click<br>targets</div>
+        </div>
+        <div style="font-size:9px;color:#666;text-align:center;width:60px;">Transparent HTML<br>for clicks only</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Full Canvas Rendering</h3>
+      <p>One large canvas covers the entire game board. Matter.js renders everything: tube glass walls, fluid particles, metaball merging, pour stream, tilt animation. HTML elements become invisible click targets laid over canvas positions.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Consistent rendering — no CSS/canvas coordination</li>
+          <li>Physics drives the tube tilt (more natural)</li>
+          <li>Cleaner long-term architecture</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>Must redraw glass effects, glows, rims on canvas</li>
+          <li>More up-front work (~2× initial effort)</li>
+          <li>Loses Framer Motion spring animations</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Animate Option A inline canvas — fluid inside the tube interior only
+(function() {
+  const canvas = document.getElementById('inlineA');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = 44, H = 148;
+  const particles = [];
+  for (let i = 0; i < 20; i++) {
+    particles.push({
+      x: 8 + Math.random() * 28,
+      y: 40 + Math.random() * 90,
+      vx: (Math.random() - 0.5) * 30,
+      vy: (Math.random() - 0.5) * 20,
+      r: 6 + Math.random() * 5,
+      color: i < 10 ? [80, 150, 255] : [255, 90, 90],
+    });
+  }
+  let last = performance.now();
+  function loop(ts) {
+    const dt = Math.min((ts - last) / 1000, 0.033);
+    last = ts;
+    ctx.clearRect(0, 0, W, H);
+    const off = document.createElement('canvas');
+    off.width = W; off.height = H;
+    const oc = off.getContext('2d');
+    for (const p of particles) {
+      p.vy += 120 * dt;
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      p.vx *= 0.98; p.vy *= 0.98;
+      if (p.y + p.r > H - 4) { p.y = H - 4 - p.r; p.vy *= -0.5; }
+      if (p.x - p.r < 3) { p.x = 3 + p.r; p.vx *= -0.6; }
+      if (p.x + p.r > W - 3) { p.x = W - 3 - p.r; p.vx *= -0.6; }
+      if (p.y < 2) { p.y = 2 + p.r; p.vy *= -0.4; }
+      const g = oc.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 1.4);
+      g.addColorStop(0, 'rgba(255,255,255,1)');
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      oc.fillStyle = g; oc.beginPath(); oc.arc(p.x, p.y, p.r * 1.4, 0, Math.PI * 2); oc.fill();
+    }
+    const imgData = oc.getImageData(0, 0, W, H);
+    const d = imgData.data;
+    // Two color groups
+    for (let i2 = 0; i2 < d.length; i2 += 4) {
+      const v = d[i2];
+      if (v > 110) { d[i2]=80; d[i2+1]=150; d[i2+2]=255; d[i2+3]=200; }
+      else { d[i2+3] = 0; }
+    }
+    ctx.putImageData(imgData, 0, 0);
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+
+// Animate Option B — full canvas tube
+(function() {
+  const canvas = document.getElementById('fullB');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = 44, H = 172;
+  const particles = [];
+  for (let i = 0; i < 20; i++) {
+    particles.push({
+      x: 10 + Math.random() * 24,
+      y: 50 + Math.random() * 90,
+      vx: (Math.random() - 0.5) * 30,
+      vy: (Math.random() - 0.5) * 20,
+      r: 6 + Math.random() * 5,
+    });
+  }
+  let last = performance.now();
+  function loop(ts) {
+    const dt = Math.min((ts - last) / 1000, 0.033);
+    last = ts;
+    ctx.clearRect(0, 0, W, H);
+    // Draw tube on canvas
+    ctx.save();
+    ctx.strokeStyle = 'rgba(200,200,255,0.4)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(8, 16); ctx.lineTo(8, H - 14);
+    ctx.quadraticCurveTo(8, H - 2, W/2, H - 2);
+    ctx.quadraticCurveTo(W - 8, H - 2, W - 8, H - 14);
+    ctx.lineTo(W - 8, 16); ctx.stroke();
+    // Rim
+    ctx.fillStyle = 'rgba(180,180,230,0.4)';
+    ctx.fillRect(5, 4, W - 10, 12);
+    ctx.restore();
+
+    const off = document.createElement('canvas');
+    off.width = W; off.height = H;
+    const oc = off.getContext('2d');
+    for (const p of particles) {
+      p.vy += 120 * dt;
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      p.vx *= 0.98; p.vy *= 0.98;
+      if (p.y + p.r > H - 6) { p.y = H - 6 - p.r; p.vy *= -0.5; }
+      if (p.x - p.r < 10) { p.x = 10 + p.r; p.vx *= -0.6; }
+      if (p.x + p.r > W - 10) { p.x = W - 10 - p.r; p.vx *= -0.6; }
+      if (p.y < 18) { p.y = 18 + p.r; p.vy *= -0.4; }
+      const g = oc.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 1.4);
+      g.addColorStop(0, 'rgba(255,255,255,1)');
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      oc.fillStyle = g; oc.beginPath(); oc.arc(p.x, p.y, p.r * 1.4, 0, Math.PI * 2); oc.fill();
+    }
+    const imgData = oc.getImageData(0, 0, W, H);
+    const d = imgData.data;
+    for (let i2 = 0; i2 < d.length; i2 += 4) {
+      const v = d[i2];
+      if (v > 110) { d[i2]=90; d[i2+1]=220; d[i2+2]=130; d[i2+3]=200; }
+      else { d[i2+3] = 0; }
+    }
+    ctx.putImageData(imgData, 0, 0);
+    // Glass reflection on top
+    ctx.save();
+    ctx.globalAlpha = 0.45;
+    const grad = ctx.createLinearGradient(10, 20, 10, H * 0.7);
+    grad.addColorStop(0, 'rgba(255,255,255,0.5)');
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(11, 20, 4, H * 0.55);
+    ctx.restore();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
