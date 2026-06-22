@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { forwardRef } from 'react';
 import type { Color } from '../types';
-import { COLOR_GRADIENTS, TUBE_CAPACITY } from '../types';
+import { TUBE_CAPACITY } from '../types';
 import { isTubeSorted } from '../utils/winChecker';
 import { LIFT_PX, TILT_DEG, EMIT_DUR, TILT_DELAY } from './PourAnimation';
 
@@ -21,9 +21,8 @@ interface TubeProps {
 }
 
 const Tube = forwardRef<HTMLDivElement, TubeProps>(
-  ({ tube, index, isSelected, onClick, tubeWidth, tubeHeight, isPouringFrom, pourToRight, pourOffsetX, incomingColor, incomingCount, leavingCount }, ref) => {
+  ({ tube, index, isSelected, onClick, tubeWidth, tubeHeight, isPouringFrom, pourToRight, pourOffsetX, incomingColor: _incomingColor, incomingCount: _incomingCount, leavingCount: _leavingCount }, ref) => {
     const sorted = isTubeSorted(tube, TUBE_CAPACITY);
-    const empty = tube.length === 0;
 
     // Two-phase pour animation:
     //   Phase 1 (0 → TILT_DELAY): slide center-to-center, lift — spring-like (easeOut)
@@ -142,65 +141,6 @@ const Tube = forwardRef<HTMLDivElement, TubeProps>(
             }}
           />
 
-          {/* Color segments (bottom → top order via column-reverse) */}
-          {tube.map((color, i) => {
-            const isLeaving = isPouringFrom && leavingCount !== undefined && i >= tube.length - leavingCount;
-            return (
-            <motion.div
-              key={`${i}-${color}`}
-              initial={{ scaleY: 0, originY: 1 }}
-              animate={{ scaleY: isLeaving ? 0 : 1 }}
-              transition={isLeaving
-                ? { duration: EMIT_DUR, ease: 'easeIn', delay: TILT_DELAY }
-                : { duration: 0.22, ease: 'easeOut', delay: i * 0.03 }}
-              style={{
-                flex: `0 0 ${100 / TUBE_CAPACITY}%`,
-                background: COLOR_GRADIENTS[color],
-                position: 'relative',
-              }}
-            >
-              {/* Sheen line between segments */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: '18%',
-                  right: 0,
-                  height: 2,
-                  background: 'rgba(255,255,255,0.22)',
-                  borderRadius: '0 1px 1px 0',
-                }}
-              />
-            </motion.div>
-            );
-          })}
-
-          {/* Incoming liquid — rises from top of existing content during pour */}
-          {incomingColor !== undefined && incomingCount !== undefined && (
-            <motion.div
-              style={{
-                position: 'absolute',
-                bottom: `${(tube.length / TUBE_CAPACITY) * 100}%`,
-                left: 0, right: 0,
-                background: COLOR_GRADIENTS[incomingColor],
-                zIndex: 1,
-              }}
-              initial={{ height: 0 }}
-              animate={{ height: `${(incomingCount / TUBE_CAPACITY) * 100}%` }}
-              transition={{ duration: EMIT_DUR, ease: 'easeIn', delay: TILT_DELAY }}
-            />
-          )}
-
-          {/* Empty state subtle glow */}
-          {empty && (
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'radial-gradient(ellipse at 50% 80%, rgba(255,255,255,0.04), transparent)',
-              }}
-            />
-          )}
         </div>
       </motion.div>
     );
