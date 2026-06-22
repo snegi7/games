@@ -8,8 +8,9 @@ export const THRESHOLD          = 110;
 export function slotCenterY(
   rect: Pick<DOMRect, 'top' | 'bottom'>,
   slotIndex: number,
+  capacity: number = TUBE_CAPACITY,
 ): number {
-  const slotH = (rect.bottom - rect.top) / TUBE_CAPACITY;
+  const slotH = (rect.bottom - rect.top) / capacity;
   return rect.bottom - slotH * slotIndex - slotH / 2;
 }
 
