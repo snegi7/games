@@ -2,7 +2,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { useGameStore } from '../store/gameStore';
 import Tube from './Tube';
 import PourAnimation, { LIFT_PX } from './PourAnimation';
-import FluidCanvas from './FluidCanvas';
+import FluidCanvas, { type FluidCanvasHandle } from './FluidCanvas';
 import type { Color } from '../types';
 
 interface AnimInfo {
@@ -30,11 +30,17 @@ export default function TubeBoard() {
   const selectedTube = useGameStore(s => s.selectedTube);
   const pendingPour  = useGameStore(s => s.pendingPour);
   const completePour = useGameStore(s => s.completePour);
-  const selectTube   = useGameStore(s => s.selectTube);
+  const selectTubeBase = useGameStore(s => s.selectTube);
 
   const boardRef  = useRef<HTMLDivElement>(null);
   const tubeRefs  = useRef<(HTMLDivElement | null)[]>([]);
+  const fluidRef  = useRef<FluidCanvasHandle>(null);
   const [animInfo, setAnimInfo] = useState<AnimInfo | null>(null);
+
+  const selectTube = useCallback((idx: number) => {
+    fluidRef.current?.jiggle(idx);
+    selectTubeBase(idx);
+  }, [selectTubeBase]);
 
   const [tubeWidth, setTubeWidth] = useState(() => calcTubeWidth(0));
   const tubeHeight = Math.round(tubeWidth * 3.2);
@@ -111,6 +117,7 @@ export default function TubeBoard() {
       }}
     >
       <FluidCanvas
+        ref={fluidRef}
         tubeRefs={tubeRefs}
         tubeCount={tubes.length}
         tubeHeight={tubeHeight}

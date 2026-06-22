@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import Matter from 'matter-js';
 import { useGameStore } from '../store/gameStore';
 import { useMatterWorld } from '../hooks/useMatterWorld';
@@ -99,13 +99,18 @@ interface StreamParticle {
 
 const GRAVITY = 2200;
 
+export interface FluidCanvasHandle {
+  jiggle: (tubeIdx: number) => void;
+}
+
 interface Props {
   tubeRefs:   React.RefObject<(HTMLDivElement | null)[]>;
   tubeCount:  number;
   tubeHeight: number;
 }
 
-export default function FluidCanvas({ tubeRefs, tubeCount, tubeHeight }: Props) {
+const FluidCanvas = forwardRef<FluidCanvasHandle, Props>(
+  function FluidCanvas({ tubeRefs, tubeCount, tubeHeight }, ref) {
   const canvasRef   = useRef<HTMLCanvasElement>(null);
   const offCanvas   = useRef<HTMLCanvasElement | null>(null);
   const streamCanvas = useRef<HTMLCanvasElement | null>(null);
@@ -113,7 +118,9 @@ export default function FluidCanvas({ tubeRefs, tubeCount, tubeHeight }: Props) 
   const tubes        = useGameStore(s => s.tubes);
   const completePour = useGameStore(s => s.completePour);
 
-  const { physicsRef, reconcile, stepAll, drainParticles } = useMatterWorld(tubeCount);
+  const { physicsRef, reconcile, stepAll, jiggle, drainParticles } = useMatterWorld(tubeCount);
+
+  useImperativeHandle(ref, () => ({ jiggle }), [jiggle]);
 
   // canvas init
   useEffect(() => {
@@ -331,7 +338,10 @@ export default function FluidCanvas({ tubeRefs, tubeCount, tubeHeight }: Props) 
       style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 1 }}
     />
   );
-}
+  }
+);
+
+export default FluidCanvas;
 
 function renderStreamMetaballs(
   ctx:       CanvasRenderingContext2D,
