@@ -2,6 +2,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { useGameStore } from '../store/gameStore';
 import Tube from './Tube';
 import PourAnimation, { LIFT_PX } from './PourAnimation';
+import FluidCanvas from './FluidCanvas';
 import type { Color } from '../types';
 
 interface AnimInfo {
@@ -109,6 +110,12 @@ export default function TubeBoard() {
         overflowX: 'auto',
       }}
     >
+      <FluidCanvas
+        tubeRefs={tubeRefs}
+        tubeCount={tubes.length}
+        tubeHeight={tubeHeight}
+      />
+
       {tubes.map((tube, i) => {
         const isFrom = animInfo !== null && pendingPour?.fromIdx === i;
         const isTo   = animInfo !== null && pendingPour?.toIdx   === i;
