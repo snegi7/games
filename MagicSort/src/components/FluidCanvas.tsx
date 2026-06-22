@@ -5,7 +5,7 @@ import { useMatterWorld } from '../hooks/useMatterWorld';
 import { COLOR_SOLID } from '../types';
 import type { Color } from '../types';
 import { BLOB_RADIUS, THRESHOLD, PARTICLES_PER_SLOT } from '../utils/fluidGeometry';
-import { TILT_DELAY, EMIT_DUR, LIFT_PX } from '../utils/pourConstants';
+import { TILT_DEG, TILT_DELAY, EMIT_DUR, LIFT_PX } from '../utils/pourConstants';
 
 function hexToRgb(hex: string): [number, number, number] {
   return [
@@ -178,7 +178,7 @@ const FluidCanvas = forwardRef<FluidCanvasHandle, Props>(
 
     const H = tubeHeight + 14;
     const easeIn = (t: number) => t * t;
-    const MAX_TILT = 42 * (Math.PI / 180);
+    const MAX_TILT = TILT_DEG * (Math.PI / 180);
     const TOTAL_DUR = TILT_DELAY + EMIT_DUR + 0.6;
 
     function rimAt(emitT: number, pivotX: number, pivotY: number): { x: number; y: number } {
