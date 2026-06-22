@@ -1,10 +1,8 @@
 import { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
-import Matter from 'matter-js';
 import { useGameStore } from '../store/gameStore';
-import { useMatterWorld } from '../hooks/useMatterWorld';
-import { COLOR_SOLID } from '../types';
+import { COLOR_SOLID, TUBE_CAPACITY } from '../types';
 import type { Color } from '../types';
-import { BLOB_RADIUS, THRESHOLD, PARTICLES_PER_SLOT } from '../utils/fluidGeometry';
+import { BLOB_RADIUS, THRESHOLD } from '../utils/fluidGeometry';
 import { TILT_DEG, TILT_DELAY, EMIT_DUR, LIFT_PX } from '../utils/pourConstants';
 
 function hexToRgb(hex: string): [number, number, number] {
@@ -15,79 +13,55 @@ function hexToRgb(hex: string): [number, number, number] {
   ];
 }
 
-function renderTubeFluid(
+function renderTubeSlots(
   ctx:       CanvasRenderingContext2D,
-  offCanvas: HTMLCanvasElement,
-  particles: Matter.Body[],
-  tubeRect:  DOMRect,
+  tube:      Color[],
+  rect:      DOMRect,
+  time:      number,
+  waveBoost: number,
 ) {
-  const w = Math.ceil(tubeRect.width);
-  const h = Math.ceil(tubeRect.height);
-  if (w <= 0 || h <= 0) return;
+  if (tube.length === 0) return;
+  const tubeH  = rect.bottom - rect.top;
+  const slotH  = tubeH / TUBE_CAPACITY;
+  const margin = 3;
+  const left   = rect.left   + margin;
+  const right  = rect.right  - margin;
+  const width  = right - left;
 
-  if (offCanvas.width < w || offCanvas.height < h) {
-    offCanvas.width  = Math.max(offCanvas.width,  w);
-    offCanvas.height = Math.max(offCanvas.height, h);
-  }
-  const offCtx = offCanvas.getContext('2d')!;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(left, rect.top, width, tubeH);
+  ctx.clip();
 
-  // Group particles by color in tube-local coords
-  const byColor = new Map<Color, { x: number; y: number }[]>();
-  for (const body of particles) {
-    const color = body.label as Color;
-    const lx = body.position.x - tubeRect.left;
-    const ly = body.position.y - tubeRect.top;
-    if (!byColor.has(color)) byColor.set(color, []);
-    byColor.get(color)!.push({ x: lx, y: ly });
-  }
+  const baseAmp = 2 + waveBoost;
 
-  for (const [color, positions] of byColor) {
-    // ROI bounds
-    let rxMin = w, ryMin = h, rxMax = 0, ryMax = 0;
-    for (const p of positions) {
-      rxMin = Math.min(rxMin, p.x - BLOB_RADIUS);
-      ryMin = Math.min(ryMin, p.y - BLOB_RADIUS);
-      rxMax = Math.max(rxMax, p.x + BLOB_RADIUS);
-      ryMax = Math.max(ryMax, p.y + BLOB_RADIUS);
-    }
-    rxMin = Math.max(0, Math.floor(rxMin));
-    ryMin = Math.max(0, Math.floor(ryMin));
-    rxMax = Math.min(w, Math.ceil(rxMax));
-    ryMax = Math.min(h, Math.ceil(ryMax));
-    const roiW = rxMax - rxMin;
-    const roiH = ryMax - ryMin;
-    if (roiW <= 0 || roiH <= 0) continue;
+  for (let slotIdx = 0; slotIdx < tube.length; slotIdx++) {
+    const color      = tube[slotIdx];
+    const slotBottom = rect.bottom - slotIdx * slotH;
+    const slotTop    = slotBottom - slotH;
+    const isTopSlot  = slotIdx === tube.length - 1;
+    const amp        = isTopSlot ? baseAmp : 1;
 
-    offCtx.clearRect(rxMin, ryMin, roiW, roiH);
+    ctx.beginPath();
+    ctx.moveTo(left, slotBottom);
+    ctx.lineTo(right, slotBottom);
 
-    for (const p of positions) {
-      const g = offCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, BLOB_RADIUS);
-      g.addColorStop(0, 'rgba(255,255,255,1)');
-      g.addColorStop(1, 'rgba(255,255,255,0)');
-      offCtx.fillStyle = g;
-      offCtx.beginPath();
-      offCtx.arc(p.x, p.y, BLOB_RADIUS, 0, Math.PI * 2);
-      offCtx.fill();
+    const steps = 32;
+    for (let s = steps; s >= 0; s--) {
+      const x  = left + (s / steps) * width;
+      const p1 = (x / width) * Math.PI * 4 + time * 1.8 + slotIdx * 1.3;
+      const p2 = (x / width) * Math.PI * 7 + time * 2.5 + slotIdx * 0.9;
+      const y  = slotTop + amp * Math.sin(p1) + amp * 0.35 * Math.sin(p2);
+      ctx.lineTo(x, y);
     }
 
-    const imgData = offCtx.getImageData(rxMin, ryMin, roiW, roiH);
-    const d       = imgData.data;
-    const [r, g2, b] = hexToRgb(COLOR_SOLID[color]);
-    for (let j = 0; j < d.length; j += 4) {
-      if (d[j] > THRESHOLD) {
-        d[j] = r; d[j + 1] = g2; d[j + 2] = b; d[j + 3] = 215;
-      } else {
-        d[j + 3] = 0;
-      }
-    }
-    offCtx.putImageData(imgData, rxMin, ryMin);
-
-    ctx.drawImage(
-      offCanvas,
-      rxMin, ryMin, roiW, roiH,
-      tubeRect.left + rxMin, tubeRect.top + ryMin, roiW, roiH,
-    );
+    ctx.closePath();
+    const [r, g, b] = hexToRgb(COLOR_SOLID[color]);
+    ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.92)`;
+    ctx.fill();
   }
+
+  ctx.restore();
 }
 
 interface StreamParticle {
@@ -111,16 +85,21 @@ interface Props {
 
 const FluidCanvas = forwardRef<FluidCanvasHandle, Props>(
   function FluidCanvas({ tubeRefs, tubeCount, tubeHeight }, ref) {
-  const canvasRef   = useRef<HTMLCanvasElement>(null);
-  const offCanvas   = useRef<HTMLCanvasElement | null>(null);
+  const canvasRef    = useRef<HTMLCanvasElement>(null);
   const streamCanvas = useRef<HTMLCanvasElement | null>(null);
+  const waveBoosts   = useRef<number[]>([]);
+  const tubesRef     = useRef<Color[][]>([]);
 
   const tubes        = useGameStore(s => s.tubes);
   const completePour = useGameStore(s => s.completePour);
 
-  const { physicsRef, reconcile, stepAll, jiggle, drainParticles } = useMatterWorld(tubeCount);
+  useEffect(() => { tubesRef.current = tubes; }, [tubes]);
 
-  useImperativeHandle(ref, () => ({ jiggle }), [jiggle]);
+  const jiggle = (tubeIdx: number) => {
+    waveBoosts.current[tubeIdx] = 8;
+  };
+
+  useImperativeHandle(ref, () => ({ jiggle }), []);
 
   // canvas init
   useEffect(() => {
@@ -130,25 +109,12 @@ const FluidCanvas = forwardRef<FluidCanvasHandle, Props>(
     canvas.height = window.innerHeight * dpr;
     canvas.style.width  = `${window.innerWidth}px`;
     canvas.style.height = `${window.innerHeight}px`;
-    offCanvas.current = document.createElement('canvas');
-    offCanvas.current.width  = 120;
-    offCanvas.current.height = 240;
     streamCanvas.current = document.createElement('canvas');
     streamCanvas.current.width  = window.innerWidth;
     streamCanvas.current.height = window.innerHeight;
   }, []);
 
-  // reconcile when tubes state changes
-  useEffect(() => {
-    if (tubes.length === 0) return;
-    const id = requestAnimationFrame(() => {
-      const rects = (tubeRefs.current ?? []).map(el => el?.getBoundingClientRect() ?? null);
-      reconcile(tubes, rects);
-    });
-    return () => cancelAnimationFrame(id);
-  }, [tubes, reconcile, tubeRefs]);
-
-  // main render + physics loop
+  // main render loop
   useEffect(() => {
     const canvas = canvasRef.current!;
     const dpr    = window.devicePixelRatio || 1;
@@ -159,21 +125,19 @@ const FluidCanvas = forwardRef<FluidCanvasHandle, Props>(
     let totalElapsed  = 0;
     let emitElapsed   = 0;
     let emitted       = 0;
-    let drained       = 0;
     let pourComplete  = false;
     let streamParticles: StreamParticle[] = [];
 
     let pourSnapshot: {
-      fromIdx:      number;
-      toIdx:        number;
-      color:        Color;
-      count:        number;
-      pivotX:       number;
-      pivotY:       number;
-      H:            number;
-      destY:        number;
-      emitRate:     number;
-      totalToDrain: number;
+      fromIdx:  number;
+      toIdx:    number;
+      color:    Color;
+      count:    number;
+      pivotX:   number;
+      pivotY:   number;
+      H:        number;
+      destY:    number;
+      emitRate: number;
     } | null = null;
 
     const H = tubeHeight + 14;
@@ -211,49 +175,51 @@ const FluidCanvas = forwardRef<FluidCanvasHandle, Props>(
       const total = Math.max(40, latestPendingPour.count * 30);
 
       pourSnapshot = {
-        fromIdx:      latestPendingPour.fromIdx,
-        toIdx:        latestPendingPour.toIdx,
-        color:        latestPendingPour.color,
-        count:        latestPendingPour.count,
+        fromIdx:  latestPendingPour.fromIdx,
+        toIdx:    latestPendingPour.toIdx,
+        color:    latestPendingPour.color,
+        count:    latestPendingPour.count,
         pivotX,
         pivotY,
         H,
         destY,
-        emitRate:     total / EMIT_DUR,
-        totalToDrain: latestPendingPour.count * PARTICLES_PER_SLOT,
+        emitRate: total / EMIT_DUR,
       };
       pourActive   = true;
       totalElapsed = 0;
       emitElapsed  = 0;
       emitted      = 0;
-      drained      = 0;
       pourComplete = false;
       streamParticles = [];
     }
 
     let lastTs = performance.now();
     let rafId: number;
+    let time = 0;
 
     function loop(ts: number) {
       const dt = Math.min((ts - lastTs) / 1000, 0.05);
       lastTs = ts;
+      time  += dt;
 
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
       if (latestPendingPour && !pourSnapshot) syncPourSnapshot();
 
-      stepAll(dt * 1000);
-
       const refs    = tubeRefs.current ?? [];
-      const physics = physicsRef.current;
+      const currentTubes = tubesRef.current;
       const skipIdx = pourActive && pourSnapshot ? pourSnapshot.fromIdx : -1;
 
-      for (let i = 0; i < physics.length; i++) {
+      for (let i = 0; i < currentTubes.length; i++) {
         if (i === skipIdx) continue;
         const el = refs[i];
         if (!el) continue;
-        const rect = el.getBoundingClientRect();
-        renderTubeFluid(ctx, offCanvas.current!, physics[i].particles, rect);
+        const rect  = el.getBoundingClientRect();
+        const boost = waveBoosts.current[i] ?? 0;
+        renderTubeSlots(ctx, currentTubes[i], rect, time, boost);
+        if (boost > 0) {
+          waveBoosts.current[i] = Math.max(0, boost - dt * 12);
+        }
       }
 
       if (pourActive && pourSnapshot) {
@@ -262,15 +228,6 @@ const FluidCanvas = forwardRef<FluidCanvasHandle, Props>(
 
         if (totalElapsed >= TILT_DELAY) {
           emitElapsed += dt;
-
-          const drainTarget = Math.min(
-            ps.totalToDrain,
-            Math.round((emitElapsed / EMIT_DUR) * ps.totalToDrain),
-          );
-          if (drainTarget > drained) {
-            drainParticles(ps.fromIdx, ps.color, drainTarget - drained);
-            drained = drainTarget;
-          }
 
           const rim    = rimAt(emitElapsed, ps.pivotX, ps.pivotY);
           const target = Math.min(Math.max(40, ps.count * 30), Math.round(emitElapsed * ps.emitRate));
@@ -330,7 +287,7 @@ const FluidCanvas = forwardRef<FluidCanvasHandle, Props>(
       unsubscribe();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [physicsRef, stepAll, drainParticles, tubeRefs, tubeHeight]);
+  }, [tubeRefs, tubeHeight, completePour]);
 
   return (
     <canvas
