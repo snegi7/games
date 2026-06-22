@@ -59,6 +59,7 @@ export function useMatterWorld(tubeCount: number) {
       // Remove old particles (keep static walls)
       Matter.Composite.clear(physics.engine.world, true);
       physics.particles = [];
+      Matter.Composite.add(physics.engine.world, [physics.leftWall, physics.rightWall, physics.bottomWall]);
 
       // Spawn particles for each occupied slot
       tube.forEach((color, slotIdx) => {
