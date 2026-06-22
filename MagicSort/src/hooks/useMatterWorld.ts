@@ -1,6 +1,7 @@
 import { useRef, useEffect, useCallback } from 'react';
 import Matter from 'matter-js';
 import type { Color } from '../types';
+import { TUBE_CAPACITY } from '../types';
 import {
   PARTICLES_PER_SLOT,
   PARTICLE_RADIUS,
@@ -56,14 +57,14 @@ export function useMatterWorld(tubeCount: number) {
       Matter.Body.setPosition(physics.rightWall,  { x: rect.right + WALL_T / 2, y: cy });
       Matter.Body.setPosition(physics.bottomWall, { x: cx, y: rect.bottom + WALL_T / 2 });
 
-      // Remove old particles (keep static walls)
-      Matter.Composite.clear(physics.engine.world, true);
+      // Remove all bodies then re-add walls (clear(world,true) keeps statics, causing duplication)
+      Matter.Composite.clear(physics.engine.world, false);
       physics.particles = [];
       Matter.Composite.add(physics.engine.world, [physics.leftWall, physics.rightWall, physics.bottomWall]);
 
       // Spawn particles for each occupied slot
       tube.forEach((color, slotIdx) => {
-        const py = slotCenterY(rect, slotIdx) - 6; // spawn slightly above to drop in
+        const py = slotCenterY(rect, slotIdx, TUBE_CAPACITY) - 6;
         const xs = spreadXPositions(rect, PARTICLES_PER_SLOT, PARTICLE_RADIUS + 2);
         xs.forEach(x => {
           const body = Matter.Bodies.circle(x, py, PARTICLE_RADIUS, {
